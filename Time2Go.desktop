@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+X-Nemo-Application-Type=silica-qt5
+Name=Time2Go
+Icon=Time2Go
+Exec=Time2Go
+
