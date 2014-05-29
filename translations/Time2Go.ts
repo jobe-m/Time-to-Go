@@ -2,7 +2,7 @@
 <!DOCTYPE TS>
 <TS version="2.0">
 <context>
-    <name>FirstPage</name>
+    <name>MainPage</name>
     <message>
         <source>Show Page 2</source>
         <translation type="unfinished"></translation>

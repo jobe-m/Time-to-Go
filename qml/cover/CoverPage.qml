@@ -1,32 +1,3 @@
-/*
-  Copyright (C) 2013 Jolla Ltd.
-  Contact: Thomas Perl <thomas.perl@jollamobile.com>
-  All rights reserved.
-
-  You may use this file under the terms of BSD license as follows:
-
-  Redistribution and use in source and binary forms, with or without
-  modification, are permitted provided that the following conditions are met:
-    * Redistributions of source code must retain the above copyright
-      notice, this list of conditions and the following disclaimer.
-    * Redistributions in binary form must reproduce the above copyright
-      notice, this list of conditions and the following disclaimer in the
-      documentation and/or other materials provided with the distribution.
-    * Neither the name of the Jolla Ltd nor the
-      names of its contributors may be used to endorse or promote products
-      derived from this software without specific prior written permission.
-
-  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
-  ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
-  WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDERS OR CONTRIBUTORS BE LIABLE FOR
-  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-  (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-  LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-  ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-  (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-*/
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
@@ -40,42 +11,53 @@ Cover {
     signal breakStopped()
     signal projectRotated()
 
-    function updateProject(projectName) {
-        // project can be only changed if not checked in
+    // This function sets the project name which is visible on the cover page.
+    // It can be only changed if not checked in.
+    function updateProject(value) {
         if (state === "CHECKED_OUT") {
-            projectLabel.text = projectName
+            projectName.text = value
         }
     }
 
+    // This function sets the working time on the cover page.
+    // It has to be invoked regularly to update the working time on the cover page.
     function updateWorkingTime(value) {
-
+        workingTime.text = value
     }
 
+    // This function sets the break time on the cover page..
+    // It has to be invoked regularly to update the break time on the cover page.
     function updateBreakTime(value) {
-
+        breakTime.text = value
     }
 
+    // This function changes the cover into check in state.
     function checkIn() {
         state = "CHECKED_IN"
         __showInfoText("Checked in now")
     }
 
+    // This function changes the cover into checked out state.
     function checkOut() {
         state = "CHECKED_OUT"
         __showInfoText("Checked out now")
     }
 
+    // This function changes the cover into paused state.
     function startBreak() {
         state = "PAUSED"
         __showInfoText("start break now")
     }
 
+    // This function recovers the cover from paused and sets it back to checked in state.
     function stopBreak() {
         state = "CHECKED_IN"
         __showInfoText("continue with work now")
     }
 
     // internal stuff following here
+
+    // This function shows an info text on the cover which will fade out after 2 seconds.
     function __showInfoText(value) {
         infoTextView.text = value
         timeTrackerView.opacity = 0.0
@@ -144,28 +126,28 @@ Cover {
         }
 
         Label {
-            id: projectLabel
+            id: projectName
             anchors.top: appName.bottom
-            anchors.topMargin: -Theme.paddingSmall
+            anchors.topMargin: Theme.paddingSmall
             anchors.horizontalCenter: parent.horizontalCenter
             width: parent.width - 2 * Theme.paddingSmall
             color: Theme.primaryColor
             horizontalAlignment: implicitWidth > width ? Text.AlignLeft : Text.AlignHCenter
             wrapMode: Text.NoWrap
             font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeSmall
+            font.pixelSize: Theme.fontSizeMedium
         }
 
         OpacityRampEffect {
-            enabled: projectLabel.implicitWidth > projectLabel.width
-            sourceItem: projectLabel
+            enabled: projectName.implicitWidth > projectName.width
+            sourceItem: projectName
             slope: 2.0
             offset: 0.5
         }
 
         Item {
             id: timeTrackerView
-            anchors.top: projectLabel.bottom
+            anchors.top: projectName.bottom
             width: parent.width
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 3 * Theme.paddingLarge
@@ -177,15 +159,25 @@ Cover {
                 spacing: 0
 
                 Label {
-                    id: coverTextLabel
+                    id: workingTime
                     enabled: text !== ""
                     visible: enabled
                     width: parent.width
-                    color: Theme.secondaryColor
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
                     font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeSmall
+                    font.pixelSize: Theme.fontSizeExtraLarge
+                }
+
+                Label {
+                    id: breakTime
+                    enabled: text !== ""
+                    visible: enabled
+                    width: parent.width
+                    horizontalAlignment: Text.AlignHCenter
+                    wrapMode: Text.Wrap
+                    font.family: Theme.fontFamily
+                    font.pixelSize: Theme.fontSizeLarge
                 }
             }
         }
@@ -194,7 +186,7 @@ Cover {
             id: infoTextView
             property alias text: infoTextLabel.text
             opacity: 0.0
-            anchors.top: projectLabel.bottom
+            anchors.top: projectName.bottom
             width: parent.width
             anchors.bottom: parent.bottom
             anchors.bottomMargin: 3 * Theme.paddingLarge
@@ -269,16 +261,22 @@ Cover {
             name: "CHECKED_OUT"
             PropertyChanges { target: rightAction; iconSource: "image://theme/icon-cover-play" } // "../../icons/icon-cover-check-in.png" }
             PropertyChanges { target: leftAction; iconSource: "image://theme/icon-cover-next" } // "../../icons/icon-cover-project.png" }
+            PropertyChanges { target: workingTime; color: Theme.secondaryColor; opacity: 0.6 }
+            PropertyChanges { target: breakTime; color: Theme.secondaryColor; opacity: 0.6 }
         },
         State {
             name: "CHECKED_IN"
             PropertyChanges { target: rightAction; iconSource: "image://theme/icon-cover-timer" } // "../../icons/icon-cover-check-out.png" }
             PropertyChanges { target: leftAction; iconSource: "image://theme/icon-cover-pause" } // "../../icons/icon-cover-start-break.png" }
+            PropertyChanges { target: workingTime; color: Theme.primaryColor; opacity: 1.0 }
+            PropertyChanges { target: breakTime; color: Theme.secondaryColor; opacity: 0.6 }
         },
         State {
             name: "PAUSED"
             PropertyChanges { target: rightAction; iconSource: "image://theme/icon-cover-timer" } // "../../icons/icon-cover-check-out.png" }
             PropertyChanges { target: leftAction; iconSource: "image://theme/icon-cover-play" } // "../../icons/icon-cover-stop-break.png" }
+            PropertyChanges { target: workingTime; color: Theme.secondaryColor; opacity: 0.6 }
+            PropertyChanges { target: breakTime; color: Theme.primaryColor; opacity: 1.0 }
         }
     ]
 }
