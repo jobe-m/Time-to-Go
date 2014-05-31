@@ -4,22 +4,38 @@
 <context>
     <name>MainPage</name>
     <message>
-        <source>Show Page 2</source>
+        <source>Check in</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>UI Template</source>
+        <source>Start break</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Hello Sailors</source>
+        <source>Check out</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Stop break</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>About</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Time2Go</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
-    <name>SecondPage</name>
+    <name>ReportPage</name>
     <message>
-        <source>Nested Page</source>
+        <source>Time2Go reports</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -18,7 +18,6 @@ SOURCES += src/Time2Go.cpp
 
 OTHER_FILES += qml/Time2Go.qml \
     qml/cover/CoverPage.qml \
-    qml/pages/SecondPage.qml \
     qml/common/InfoPopup.qml \
     rpm/Time2Go.changes.in \
     rpm/Time2Go.spec \
@@ -26,7 +25,8 @@ OTHER_FILES += qml/Time2Go.qml \
     translations/*.ts \
     Time2Go.desktop \
     qml/pages/MainPage.qml \
-    qml/scripts/Global.js
+    qml/scripts/Global.js \
+    qml/pages/ReportPage.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line

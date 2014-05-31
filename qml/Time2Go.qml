@@ -32,12 +32,45 @@ ApplicationWindow
     id: applicationWindow
 
     // For accessing main page to pass further application activity status
-    property MainPage mainPageRef: null
-    // For accessing info popup from everywhere make it global for the application
-    property InfoPopup infoPopupRef: infoPopup
+    property MainPage mainPage: null
 
-    // application global properties
-    property string databaseUiName: ""
+    // application global properties and functions
+    function checkIn() {
+        coverPage.checkIn()
+        mainPage.checkIn()
+        Global.setWorkingStart()
+        uiUpdateTimer.restart()
+    }
+
+    function checkOut() {
+        coverPage.checkOut()
+        mainPage.checkOut()
+        Global.setWorkingEnd()
+        uiUpdateTimer.stop()
+    }
+
+    function startBreak() {
+        coverPage.startBreak()
+        mainPage.startBreak()
+        Global.setBreakStart()
+    }
+
+    function stopBreak() {
+        coverPage.stopBreak()
+        mainPage.stopBreak()
+        Global.setBreakEnd()
+    }
+
+    function setProject(value) {
+        // if no project name was given then just take next available project
+        if (value === "") {
+            Global.activateNextProject()
+        } else {
+            Global.activateProject(value);
+        }
+        coverPage.setActiveProject(Global.getActiveProject())
+        mainPage.setActiveProject(Global.getActiveProject())
+    }
 
     initialPage: mainPageContainer
     cover: coverPage
@@ -51,52 +84,34 @@ ApplicationWindow
     Component {
         id: mainPageContainer
         MainPage {
-            id: mainPage
-            Component.onCompleted: mainPageRef = mainPage
+            id: mainPageObj
+            Component.onCompleted: mainPage = mainPageObj
         }
     }
 
     CoverPage {
         id: coverPage
-        onCheckedIn: {
-            Global.setWorkingStart()
-            uiUpdateTimer.restart()
-        }
-        onCheckedOut: {
-            Global.setWorkingEnd()
-            uiUpdateTimer.stop()
-        }
-        onBreakStarted: {
-            Global.setBreakStart()
-        }
-        onBreakStopped: {
-            Global.setBreakEnd()
-        }
-        onProjectChanged: {
-            Global.activateNextProject()
-            coverPage.setActiveProject(Global.getActiveProject())
-        }
+        onCheckedIn: applicationWindow.checkIn()
+        onCheckedOut: applicationWindow.checkOut()
+        onBreakStarted: applicationWindow.startBreak()
+        onBreakStopped: applicationWindow.stopBreak()
+        onProjectChanged: applicationWindow.setProject("")
     }
 
     Timer {
         id: uiUpdateTimer
         interval: Global.ms
         repeat: true
+        triggeredOnStart: true
         onTriggered: {
             coverPage.setWorkingTime(Global.getWorkingTime())
             coverPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
         }
     }
 
-    onApplicationActiveChanged: {
-        // Application goes into background or returns to active focus again
-        if (applicationActive) {
-        } else {
-        }
-    }
-
     Component.onCompleted: {
         // initialize cover page
+// TODO set from settings
         coverPage.setMaxWorkingTime(60*60*10) // set to 10 hours
         coverPage.setActiveProject(Global.getActiveProject())
         coverPage.setWorkingTime(Global.getWorkingTime())

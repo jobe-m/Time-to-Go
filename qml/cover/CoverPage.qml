@@ -273,12 +273,10 @@ Cover {
                     projectChanged()
                     break
                 case "CHECKED_IN":
-                    startBreak()
                     // send signal to application
                     breakStarted()
                     break
                 case "PAUSED":
-                    stopBreak()
                     // send signal to application
                     breakStopped()
                     break
@@ -291,7 +289,6 @@ Cover {
             onTriggered: {
                 switch (coverPage.state) {
                 case "CHECKED_OUT":
-                    checkIn()
                     // send signal to application
                     checkedIn()
                     break
@@ -300,7 +297,6 @@ Cover {
                     breakStopped()
                     // fall through
                 case "CHECKED_IN":
-                    checkOut()
                     // send signal to application
                     checkedOut()
                     break

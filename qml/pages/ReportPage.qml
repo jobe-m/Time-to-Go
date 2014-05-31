@@ -4,14 +4,16 @@ import Sailfish.Silica 1.0
 
 
 Page {
-    id: page
+    id: reportPage
+
     SilicaListView {
         id: listView
         model: 20
         anchors.fill: parent
         header: PageHeader {
-            title: qsTr("Nested Page")
+            title: qsTr("Time2Go reports")
         }
+
         delegate: BackgroundItem {
             id: delegate
 
@@ -21,13 +23,9 @@ Page {
                 anchors.verticalCenter: parent.verticalCenter
                 color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
             }
-            onClicked: console.log("Clicked " + index)
+            onClicked: {}
         }
+
         VerticalScrollDecorator {}
     }
 }
-
-
-
-
-

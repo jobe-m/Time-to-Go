@@ -90,7 +90,7 @@ function getWorkingTime() {
             automaticBreakTime = 60*60*0.75
             sec = sec - 60*60*0.75
         }
-        console.log("worktime: " + sec/60/60 + "  autobreaktime: " + automaticBreakTime/60/60)
+//        console.log("worktime: " + sec/60/60 + "  autobreaktime: " + automaticBreakTime/60/60)
     }
     return sec
 }

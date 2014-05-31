@@ -1,44 +1,118 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../scripts/Global.js" as Global
 
 
 Page {
-    id: page
+    id: mainPage
 
-    // To enable PullDownMenu, place our content in a SilicaFlickable
+    function checkIn() {
+        state = "CHECKED_IN"
+    }
+
+    function checkOut() {
+        state = "CHECKED_OUT"
+    }
+
+    function startBreak() {
+        state = "PAUSED"
+    }
+
+    function stopBreak() {
+        state = "CHECKED_IN"
+    }
+
+    function setActiveProject(value) {
+// TODO
+    }
+
     SilicaFlickable {
         anchors.fill: parent
 
-        // PullDownMenu and PushUpMenu must be declared in SilicaFlickable, SilicaListView or SilicaGridView
         PullDownMenu {
             MenuItem {
-                text: qsTr("Show Page 2")
-                onClicked: pageStack.push(Qt.resolvedUrl("SecondPage.qml"))
+                enabled: mainPage.state === "CHECKED_OUT"
+                visible: enabled
+                text: qsTr("Check in")
+                onClicked: {
+                    applicationWindow.checkIn()
+                }
+            }
+
+            MenuItem {
+                enabled: mainPage.state === "CHECKED_IN"
+                visible: enabled
+                text: qsTr("Start break")
+                onClicked: {
+                    applicationWindow.startBreak()
+                }
+            }
+
+            MenuItem {
+                enabled: mainPage.state === "CHECKED_IN"
+                visible: enabled
+                text: qsTr("Check out")
+                onClicked: {
+                    applicationWindow.checkOut()
+                }
+            }
+
+            MenuItem {
+                enabled: mainPage.state === "PAUSED"
+                visible: enabled
+                text: qsTr("Stop break")
+                onClicked: {
+                    applicationWindow.stopBreak()
+                }
             }
         }
 
-        // Tell SilicaFlickable the height of its content.
+        PushUpMenu {
+            MenuItem {
+                text: qsTr("About")
+                onClicked: {}
+            }
+
+            MenuItem {
+                text: qsTr("Settings")
+                onClicked: {}
+            }
+        }
+
         contentHeight: column.height
 
-        // Place our content in a Column.  The PageHeader is always placed at the top
-        // of the page, followed by our content.
         Column {
             id: column
 
-            width: page.width
+            width: mainPage.width
             spacing: Theme.paddingLarge
+
             PageHeader {
-                title: qsTr("UI Template")
+                title: qsTr("Time2Go")
             }
-            Label {
-                x: Theme.paddingLarge
-                text: qsTr("Hello Sailors")
-                color: Theme.secondaryHighlightColor
-                font.pixelSize: Theme.fontSizeExtraLarge
-            }
+
         }
     }
+
+    Component.onCompleted: {
+        pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
+    }
+
+    state: "CHECKED_OUT"
+
+    states: [
+        State {
+            name: "CHECKED_OUT"
+        },
+        State {
+            name: "CHECKED_IN"
+        },
+        State {
+            name: "PAUSED"
+        },
+        State {
+            name: "AUTO_PAUSED"
+        }
+    ]
 }
-
-
