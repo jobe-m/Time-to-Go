@@ -1,6 +1,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import "../scripts/Global.js" as Global
 
 Cover {
     id: coverPage
@@ -9,26 +10,51 @@ Cover {
     signal checkedOut()
     signal breakStarted()
     signal breakStopped()
-    signal projectRotated()
+    signal projectChanged()
 
-    // This function sets the project name which is visible on the cover page.
-    // It can be only changed if not checked in.
-    function updateProject(value) {
+    // This function set max working hours per day in seconds
+    function setMaxWorkingTime(value) {
+        __maxWorkingTime = value
+    }
+
+    // This function set active project name
+    function setActiveProject(value) {
         if (state === "CHECKED_OUT") {
             projectName.text = value
         }
     }
 
-    // This function sets the working time on the cover page.
-    // It has to be invoked regularly to update the working time on the cover page.
-    function updateWorkingTime(value) {
-        workingTime.text = value
+    // This function set working time in seconds
+    function setWorkingTime(value) {
+        if (state === "CHECKED_IN") {
+            __workingTime = value
+            var sec = value
+            var min = (sec/60).toFixedDown(0)
+            var hour = (min/60).toFixedDown(0)
+            workingTime.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
+                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+        }
     }
 
-    // This function sets the break time on the cover page..
-    // It has to be invoked regularly to update the break time on the cover page.
-    function updateBreakTime(value) {
-        breakTime.text = value
+    // This function set break time in seconds
+    function setBreakTime(value, automaticBreakTime) {
+        // Check if cover needs to change to auto break state
+        if ((automaticBreakTime > 0 && automaticBreakTime < 60*60*0.5) ||
+                (automaticBreakTime > 60*60*0.5 && automaticBreakTime < 60*60*0.75)) {
+            startAutoBreak()
+        } else if (automaticBreakTime > 0) {
+            stopAutoBreak()
+        }
+
+        if (state === "PAUSED" || state === "AUTO_PAUSED") {
+            var sec = value
+            var min = (sec/60).toFixedDown(0)
+            var hour = (min/60).toFixedDown(0)
+            breakTime.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
+                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+        }
     }
 
     // This function changes the cover into check in state.
@@ -45,17 +71,40 @@ Cover {
 
     // This function changes the cover into paused state.
     function startBreak() {
-        state = "PAUSED"
-        __showInfoText("start break now")
+        if (state === "CHECKED_IN") {
+            state = "PAUSED"
+            __showInfoText("start break now")
+        }
     }
 
     // This function recovers the cover from paused and sets it back to checked in state.
     function stopBreak() {
-        state = "CHECKED_IN"
-        __showInfoText("continue with work now")
+        if (state === "PAUSED") {
+            state = "CHECKED_IN"
+            __showInfoText("continue with work now")
+        }
+    }
+
+    // This function changes the cover into automatic paused state.
+    function startAutoBreak() {
+        if (state === "CHECKED_IN") {
+            state = "AUTO_PAUSED"
+            __showInfoText("start automatic break now")
+        }
+    }
+
+    // This function recovers the cover from automatic paused and sets it back to checked in state.
+    function stopAutoBreak() {
+        if (state === "AUTO_PAUSED") {
+            state = "CHECKED_IN"
+            __showInfoText("automatic break finished")
+        }
     }
 
     // internal stuff following here
+    property string __prev_state: ""
+    property int __maxWorkingTime: 60*60*9999 // in seconds
+    property int __workingTime: 0 // in seconds
 
     // This function shows an info text on the cover which will fade out after 2 seconds.
     function __showInfoText(value) {
@@ -167,6 +216,11 @@ Cover {
                     wrapMode: Text.Wrap
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeExtraLarge
+                    text: "--:--:--"
+                    color: __workingTime > __maxWorkingTime ?
+                               "red" : (coverPage.state === "CHECKED_IN" ?
+                                            Theme.primaryColor : Theme.secondaryColor)
+                    opacity: coverPage.state === "CHECKED_IN" ? 1.0 : 0.6
                 }
 
                 Label {
@@ -178,6 +232,7 @@ Cover {
                     wrapMode: Text.Wrap
                     font.family: Theme.fontFamily
                     font.pixelSize: Theme.fontSizeLarge
+                    text: "--:--:--"
                 }
             }
         }
@@ -215,7 +270,7 @@ Cover {
                 switch (coverPage.state) {
                 case "CHECKED_OUT":
                     // send signal to application
-                    projectRotated()
+                    projectChanged()
                     break
                 case "CHECKED_IN":
                     startBreak()
@@ -261,21 +316,24 @@ Cover {
             name: "CHECKED_OUT"
             PropertyChanges { target: rightAction; iconSource: "image://theme/icon-cover-play" } // "../../icons/icon-cover-check-in.png" }
             PropertyChanges { target: leftAction; iconSource: "image://theme/icon-cover-next" } // "../../icons/icon-cover-project.png" }
-            PropertyChanges { target: workingTime; color: Theme.secondaryColor; opacity: 0.6 }
             PropertyChanges { target: breakTime; color: Theme.secondaryColor; opacity: 0.6 }
         },
         State {
             name: "CHECKED_IN"
             PropertyChanges { target: rightAction; iconSource: "image://theme/icon-cover-timer" } // "../../icons/icon-cover-check-out.png" }
             PropertyChanges { target: leftAction; iconSource: "image://theme/icon-cover-pause" } // "../../icons/icon-cover-start-break.png" }
-            PropertyChanges { target: workingTime; color: Theme.primaryColor; opacity: 1.0 }
             PropertyChanges { target: breakTime; color: Theme.secondaryColor; opacity: 0.6 }
         },
         State {
             name: "PAUSED"
             PropertyChanges { target: rightAction; iconSource: "image://theme/icon-cover-timer" } // "../../icons/icon-cover-check-out.png" }
             PropertyChanges { target: leftAction; iconSource: "image://theme/icon-cover-play" } // "../../icons/icon-cover-stop-break.png" }
-            PropertyChanges { target: workingTime; color: Theme.secondaryColor; opacity: 0.6 }
+            PropertyChanges { target: breakTime; color: Theme.primaryColor; opacity: 1.0 }
+        },
+        State {
+            name: "AUTO_PAUSED"
+            PropertyChanges { target: rightAction; iconSource: "image://theme/icon-cover-timer" } // "../../icons/icon-cover-check-out.png" }
+            PropertyChanges { target: leftAction; iconSource: "image://theme/icon-cover-pause" } // "../../icons/icon-cover-start-break.png" }
             PropertyChanges { target: breakTime; color: Theme.primaryColor; opacity: 1.0 }
         }
     ]

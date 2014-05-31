@@ -65,9 +65,6 @@ ApplicationWindow
         onCheckedOut: {
             Global.setWorkingEnd()
             uiUpdateTimer.stop()
-            // update one last time cover page
-            coverPage.updateWorkingTime(Global.getWorkingTime())
-            coverPage.updateBreakTime(Global.getBreakTime())
         }
         onBreakStarted: {
             Global.setBreakStart()
@@ -75,16 +72,19 @@ ApplicationWindow
         onBreakStopped: {
             Global.setBreakEnd()
         }
-        onProjectRotated: {}
+        onProjectChanged: {
+            Global.activateNextProject()
+            coverPage.setActiveProject(Global.getActiveProject())
+        }
     }
 
     Timer {
         id: uiUpdateTimer
-        interval: 1000
+        interval: Global.ms
         repeat: true
         onTriggered: {
-            coverPage.updateWorkingTime(Global.getWorkingTime())
-            coverPage.updateBreakTime(Global.getBreakTime())
+            coverPage.setWorkingTime(Global.getWorkingTime())
+            coverPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
         }
     }
 
@@ -97,8 +97,9 @@ ApplicationWindow
 
     Component.onCompleted: {
         // initialize cover page
-        coverPage.updateProject(Global.getActiveProject())
-        coverPage.updateWorkingTime(Global.getWorkingTime())
-        coverPage.updateBreakTime(Global.getBreakTime())
+        coverPage.setMaxWorkingTime(60*60*10) // set to 10 hours
+        coverPage.setActiveProject(Global.getActiveProject())
+        coverPage.setWorkingTime(Global.getWorkingTime())
+        coverPage.setBreakTime(Global.getBreakTime())
     }
 }

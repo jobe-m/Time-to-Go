@@ -15,6 +15,8 @@ var breakStart = 0
 var breakEnd = 0
 var activeProject = "Conti"
 
+var ms = 1000
+var automaticBreakTime = 0
 
 function setWorkingStart() {
     if (!working && !paused) {
@@ -48,8 +50,16 @@ function setBreakEnd() {
     }
 }
 
+function activateNextProject() {
+
+}
+
 function getActiveProject() {
     return activeProject
+}
+
+function getAutoBreakTime() {
+    return automaticBreakTime
 }
 
 function getWorkingTime() {
@@ -60,28 +70,44 @@ function getWorkingTime() {
     } else if (paused) {
         msec = breakStart.getTime() - workingStart.getTime()
     }
-    var sec = (msec/10).toFixedDown(0)
-    var min = (sec/60).toFixedDown(0)
-    var hour = (min/60).toFixedDown(0)
-    return (hour < 10 ? "0" : "") + (hour).toString() + ":" +
-            (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
-            (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+    var sec = (msec/ms).toFixedDown(0)
+
+    // check working time if automatic break needs to be applied
+    if (breakStart === 0) {
+        if (sec < 60*60*6) { // less than 6 hours work
+            // no break
+            automaticBreakTime = 0
+        } else if (sec > 60*60*6 && sec < 60*60*(6+0.5)) {
+            automaticBreakTime = sec - 60*60*6
+            sec = 60*60*6
+        } else if (sec > 60*60*(6+0.5) && sec < 60*60*(9+0.5)) {
+            automaticBreakTime = 60*60*0.5
+            sec = sec - 60*60*0.5
+        } else if (sec > 60*60*(9+0.5) && sec < 60*60*(9+0.5+0.25)) {
+            automaticBreakTime = sec - 60*60*9
+            sec = 60*60*9
+        } else if (sec > 60*60*(9+0.5+0.25)) {
+            automaticBreakTime = 60*60*0.75
+            sec = sec - 60*60*0.75
+        }
+        console.log("worktime: " + sec/60/60 + "  autobreaktime: " + automaticBreakTime/60/60)
+    }
+    return sec
 }
 
 function getBreakTime() {
-    var msec = 0.0
-    if (paused) {
-        var now = new Date()
+    var msec, now, work_sec, sec
+    if (breakStart === 0) {
+        sec = automaticBreakTime
+    } else if (paused) {
+        now = new Date()
         msec = now.getTime() - breakStart.getTime()
+        sec = (msec/ms).toFixedDown(0)
     } else if (breakEnd !== 0 && breakStart !== 0){
         msec = breakEnd.getTime() - breakStart.getTime()
+        sec = (msec/ms).toFixedDown(0)
     }
-    var sec = (msec/10).toFixedDown(0)
-    var min = (sec/60).toFixedDown(0)
-    var hour = (min/60).toFixedDown(0)
-    return (hour < 10 ? "0" : "") + (hour).toString() + ":" +
-            (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
-            (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+    return sec
 }
 
 // Function to truncate a float number instead of round up/down
