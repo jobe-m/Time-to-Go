@@ -184,7 +184,7 @@ Cover {
             horizontalAlignment: implicitWidth > width ? Text.AlignLeft : Text.AlignHCenter
             wrapMode: Text.NoWrap
             font.family: Theme.fontFamily
-            font.pixelSize: Theme.fontSizeMedium
+            font.pixelSize: Theme.fontSizeLarge
         }
 
         OpacityRampEffect {
@@ -215,7 +215,7 @@ Cover {
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
                     font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeExtraLarge
+                    font.pixelSize: Theme.fontSizeHuge
                     text: "--:--:--"
                     color: __workingTime > __maxWorkingTime ?
                                "red" : (coverPage.state === "CHECKED_IN" ?
@@ -231,7 +231,7 @@ Cover {
                     horizontalAlignment: Text.AlignHCenter
                     wrapMode: Text.Wrap
                     font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeLarge
+                    font.pixelSize: Theme.fontSizeExtraLarge
                     text: "--:--:--"
                 }
             }
