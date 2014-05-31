@@ -50,10 +50,13 @@ Page {
             }
 
             MenuItem {
-                enabled: mainPage.state === "CHECKED_IN"
+                enabled: mainPage.state === "CHECKED_IN" || mainPage.state === "PAUSED"
                 visible: enabled
                 text: qsTr("Check out")
                 onClicked: {
+                    if (mainPage.state === "PAUSED") {
+                        applicationWindow.stopBreak()
+                    }
                     applicationWindow.checkOut()
                 }
             }
@@ -95,8 +98,13 @@ Page {
         }
     }
 
+    onStatusChanged: {
+        if (status === PageStatus.Active) {
+            pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
+        }
+    }
+
     Component.onCompleted: {
-        pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
     }
 
     state: "CHECKED_OUT"
