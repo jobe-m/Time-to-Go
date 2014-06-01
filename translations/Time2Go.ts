@@ -31,6 +31,18 @@
         <source>Time2Go</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Active project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Working begin and end</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Break begin and end</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReportPage</name>

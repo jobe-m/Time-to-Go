@@ -7,12 +7,29 @@ import "../scripts/Global.js" as Global
 Page {
     id: mainPage
 
-    function checkIn() {
+    function checkIn(value) {
         state = "CHECKED_IN"
+        var date = new Date(value)
+        var hour = date.getHours()
+        var min = date.getMinutes()
+        var sec = date.getSeconds()
+        workBeginLabel.text = (hour < 10 ? "0" : "") + hour.toString() + ":" +
+                (min < 10 ? "0" : "") + min.toString() + ":" +
+                (sec < 10 ? "0" : "") + sec.toString()
+        workBeginLabel.hour = hour
+        workBeginLabel.min = min
+        workBeginLabel.sec = sec
     }
 
-    function checkOut() {
+    function checkOut(value) {
         state = "CHECKED_OUT"
+        var date = new Date(value)
+        var hour = date.getHours()
+        var min = date.getMinutes()
+        var sec = date.getSeconds()
+        workEndLabel.text = (hour < 10 ? "0" : "") + hour.toString() + ":" +
+                (min < 10 ? "0" : "") + min.toString() + ":" +
+                (sec < 10 ? "0" : "") + sec.toString()
     }
 
     function startBreak() {
@@ -24,7 +41,15 @@ Page {
     }
 
     function setActiveProject(value) {
-// TODO
+        activeProjectLabel.text = value
+    }
+
+    function setWorkBegin(value) {
+        workBeginLabel.text = value
+    }
+
+    function setWorkEnd(value) {
+        workEndLabel.text = value
     }
 
     SilicaFlickable {
@@ -95,6 +120,72 @@ Page {
                 title: qsTr("Time2Go")
             }
 
+            SectionHeader {
+                text: qsTr("Active project")
+            }
+
+            Label {
+                id: activeProjectLabel
+                x: Theme.paddingLarge
+                width: (parent ? parent.width : Screen.width) - Theme.paddingLarge * 2
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                font.pixelSize: Theme.fontSizeExtraLarge
+                wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+            }
+
+            SectionHeader {
+                text: qsTr("Working begin and end")
+            }
+
+            Item {
+                x: Theme.paddingLarge
+                width: parent.width - Theme.paddingLarge * 2
+                height: workBeginLabel.height
+
+                Label {
+                    id: workBeginLabel
+                    property int hour: 0
+                    property int min: 0
+                    property int sec: 0
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    font.pixelSize: Theme.fontSizeExtraLarge
+                    text: "--:--:--"
+                }
+
+                IconButton {
+                    anchors.left: workBeginLabel.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://theme/icon-m-right"
+                    onClicked: {
+                        var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
+                                                        hour: workBeginLabel.hour,
+                                                        minute: workBeginLabel.min,
+                                                        hourMode: DateTime.TwentyfourHours
+                                                    })
+                        dialog.accepted.connect(function() {
+                            workBeginLabel.text = dialog.timeText + ":" +
+                                    (workBeginLabel.sec < 10 ? "0" : "") + workBeginLabel.sec.toString()
+                            workBeginLabel.hour = dialog.hour
+                            workBeginLabel.min = dialog.minute
+                            Global.updateWorkingStart(dialog.hour, dialog.minute)
+                        })
+                    }
+                }
+
+                Label {
+                    id: workEndLabel
+                    anchors.top: parent.top
+                    anchors.right: parent.right
+                    font.pixelSize: Theme.fontSizeExtraLarge
+                    text: "--:--:--"
+                }
+            }
+
+            SectionHeader {
+                text: qsTr("Break begin and end")
+            }
         }
     }
 

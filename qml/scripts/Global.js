@@ -13,7 +13,7 @@ var workingEnd = 0
 var paused = false
 var breakStart = 0
 var breakEnd = 0
-var activeProject = "Conti"
+var activeProject = "My amusing project"
 
 var ms = 1000
 var automaticBreakTime = 0
@@ -24,6 +24,10 @@ function setWorkingStart() {
         working = true
         paused = false
     }
+}
+
+function updateWorkingStart(hour, min) {
+    workingStart.setHours(hour, min)
 }
 
 function setWorkingEnd() {
@@ -60,6 +64,22 @@ function getActiveProject() {
 
 function getAutoBreakTime() {
     return automaticBreakTime
+}
+
+function getWorkBeginTime() {
+    return workingStart.getTime()
+}
+
+function getWorkEndTime() {
+    return workingEnd.getTime()
+}
+
+function getBreakBeginTime() {
+    return breakStart.getTime()
+}
+
+function getBreakEndTime() {
+    return breakEnd.getTime()
 }
 
 function getWorkingTime() {

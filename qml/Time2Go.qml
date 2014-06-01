@@ -36,29 +36,29 @@ ApplicationWindow
 
     // application global properties and functions
     function checkIn() {
-        coverPage.checkIn()
-        mainPage.checkIn()
         Global.setWorkingStart()
+        coverPage.checkIn()
+        mainPage.checkIn(Global.getWorkBeginTime())
         uiUpdateTimer.restart()
     }
 
     function checkOut() {
-        coverPage.checkOut()
-        mainPage.checkOut()
         Global.setWorkingEnd()
+        coverPage.checkOut()
+        mainPage.checkOut(Global.getWorkEndTime())
         uiUpdateTimer.stop()
     }
 
     function startBreak() {
+        Global.setBreakStart()
         coverPage.startBreak()
         mainPage.startBreak()
-        Global.setBreakStart()
     }
 
     function stopBreak() {
+        Global.setBreakEnd()
         coverPage.stopBreak()
         mainPage.stopBreak()
-        Global.setBreakEnd()
     }
 
     function setProject(value) {
@@ -116,5 +116,6 @@ ApplicationWindow
         coverPage.setActiveProject(Global.getActiveProject())
         coverPage.setWorkingTime(Global.getWorkingTime())
         coverPage.setBreakTime(Global.getBreakTime())
+        mainPage.setActiveProject(Global.getActiveProject())
     }
 }
