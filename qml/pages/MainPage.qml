@@ -13,12 +13,12 @@ Page {
         var hour = date.getHours()
         var min = date.getMinutes()
         var sec = date.getSeconds()
-        workBeginLabel.text = (hour < 10 ? "0" : "") + hour.toString() + ":" +
-                (min < 10 ? "0" : "") + min.toString() + ":" +
-                (sec < 10 ? "0" : "") + sec.toString()
-        workBeginLabel.hour = hour
-        workBeginLabel.min = min
-        workBeginLabel.sec = sec
+        beginTime.text = (hour < 10 ? "0" : "") + hour.toString() + ":" +
+                (min < 10 ? "0" : "") + min.toString() /*+ ":" +
+                (sec < 10 ? "0" : "") + sec.toString()*/
+        beginTime.hour = hour
+        beginTime.min = min
+        beginTime.sec = sec
     }
 
     function checkOut(value) {
@@ -27,9 +27,12 @@ Page {
         var hour = date.getHours()
         var min = date.getMinutes()
         var sec = date.getSeconds()
-        workEndLabel.text = (hour < 10 ? "0" : "") + hour.toString() + ":" +
-                (min < 10 ? "0" : "") + min.toString() + ":" +
-                (sec < 10 ? "0" : "") + sec.toString()
+        endTime.text = (hour < 10 ? "0" : "") + hour.toString() + ":" +
+                (min < 10 ? "0" : "") + min.toString() /*+ ":" +
+                (sec < 10 ? "0" : "") + sec.toString()*/
+        endTime.hour = hour
+        endTime.min = min
+        endTime.sec = sec
     }
 
     function startBreak() {
@@ -45,11 +48,11 @@ Page {
     }
 
     function setWorkBegin(value) {
-        workBeginLabel.text = value
+        beginTime.text = value
     }
 
     function setWorkEnd(value) {
-        workEndLabel.text = value
+        endTime.text = value
     }
 
     SilicaFlickable {
@@ -135,56 +138,119 @@ Page {
             }
 
             SectionHeader {
-                text: qsTr("Working begin and end")
+                text: qsTr("Begin and end of work unit")
             }
 
             Item {
                 x: Theme.paddingLarge
                 width: parent.width - Theme.paddingLarge * 2
-                height: workBeginLabel.height
+                height: beginDate.height
 
                 Label {
-                    id: workBeginLabel
+                    id: beginDate
                     property int hour: 0
                     property int min: 0
                     property int sec: 0
-                    anchors.top: parent.top
                     anchors.left: parent.left
-                    font.pixelSize: Theme.fontSizeExtraLarge
-                    text: "--:--:--"
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: Theme.fontSizeMedium
+                    text: "--/--"
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                        }
+                    }
                 }
 
                 IconButton {
-                    anchors.left: workBeginLabel.right
+                    id: dateIcon
+                    anchors.left: beginDate.right
                     anchors.verticalCenter: parent.verticalCenter
-                    icon.source: "image://theme/icon-m-right"
-                    onClicked: {
-                        var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
-                                                        hour: workBeginLabel.hour,
-                                                        minute: workBeginLabel.min,
-                                                        hourMode: DateTime.TwentyfourHours
-                                                    })
-                        dialog.accepted.connect(function() {
-                            workBeginLabel.text = dialog.timeText + ":" +
-                                    (workBeginLabel.sec < 10 ? "0" : "") + workBeginLabel.sec.toString()
-                            workBeginLabel.hour = dialog.hour
-                            workBeginLabel.min = dialog.minute
-                            Global.updateWorkingStart(dialog.hour, dialog.minute)
-                        })
+                    icon.source: "image://theme/icon-s-date"
+                    highlighted: true
+                }
+
+                Label {
+                    id: endDate
+                    anchors.left: dateIcon.right
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: Theme.fontSizeMedium
+                    text: "--/--"
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                        }
                     }
                 }
 
                 Label {
-                    id: workEndLabel
-                    anchors.top: parent.top
+                    id: beginTime
+                    property int hour: 0
+                    property int min: 0
+                    property int sec: 0
+                    anchors.right: timeIcon.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: Theme.fontSizeMedium
+                    text: "--:--" /* + ":--"*/
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
+                                                            hour: beginTime.hour,
+                                                            minute: beginTime.min,
+                                                            hourMode: DateTime.TwentyfourHours
+                                                        })
+                            dialog.accepted.connect(function() {
+                                beginTime.text = dialog.timeText /*+ ":" +
+                                        (beginTime.sec < 10 ? "0" : "") + beginTime.sec.toString()*/
+                                beginTime.hour = dialog.hour
+                                beginTime.min = dialog.minute
+                                Global.updateWorkingStart(dialog.hour, dialog.minute)
+                            })
+                        }
+                    }
+                }
+
+                IconButton {
+                    id: timeIcon
+                    anchors.right: endTime.left
+                    anchors.verticalCenter: parent.verticalCenter
+                    icon.source: "image://theme/icon-s-time"
+                    highlighted: true
+                }
+
+                Label {
+                    id: endTime
                     anchors.right: parent.right
-                    font.pixelSize: Theme.fontSizeExtraLarge
-                    text: "--:--:--"
+                    anchors.verticalCenter: parent.verticalCenter
+                    font.pixelSize: Theme.fontSizeMedium
+                    text: "--:--" /* + ":--"*/
+
+                    MouseArea {
+                        anchors.fill: parent
+                        onClicked: {
+                            var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
+                                                            hour: endTime.hour,
+                                                            minute: endTime.min,
+                                                            hourMode: DateTime.TwentyfourHours
+                                                        })
+                            dialog.accepted.connect(function() {
+                                endTime.text = dialog.timeText /*+ ":" +
+                                        (endTime.sec < 10 ? "0" : "") + endTime.sec.toString()*/
+                                endTime.hour = dialog.hour
+                                endTime.min = dialog.minute
+                                Global.updateWorkingStart(dialog.hour, dialog.minute)
+                            })
+                        }
+                    }
                 }
             }
 
             SectionHeader {
-                text: qsTr("Break begin and end")
+                text: qsTr("Begin and end of break(s)")
             }
         }
     }

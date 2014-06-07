@@ -36,11 +36,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Working begin and end</source>
+        <source>Begin and end of work unit</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Break begin and end</source>
+        <source>Begin and end of break(s)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
