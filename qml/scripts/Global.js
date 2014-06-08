@@ -26,8 +26,20 @@ function setWorkingStart() {
     }
 }
 
-function updateWorkingStart(hour, min) {
+function updateWorkingStartDate(year, month, day) {
+    workingStart.setFullYear(year, month, day)
+}
+
+function updateWorkingStartTime(hour, min) {
     workingStart.setHours(hour, min)
+}
+
+function updateWorkingEndDate(year, month, day) {
+    workingEnd.setFullYear(year,month,day)
+}
+
+function updateWorkingEndTime(hour, min) {
+    workingEnd.setHours(hour, min)
 }
 
 function setWorkingEnd() {

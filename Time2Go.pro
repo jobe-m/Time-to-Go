@@ -26,7 +26,8 @@ OTHER_FILES += qml/Time2Go.qml \
     Time2Go.desktop \
     qml/pages/MainPage.qml \
     qml/scripts/Global.js \
-    qml/pages/ReportPage.qml
+    qml/pages/ReportPage.qml \
+    qml/common/DateTimeLine.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line
