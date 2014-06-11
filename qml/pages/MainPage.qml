@@ -139,6 +139,86 @@ Page {
             }
 
             SectionHeader {
+                text: qsTr("Time spend on active project")
+            }
+
+            Item {
+                x: Theme.paddingLarge
+                width: parent.width - Theme.paddingLarge * 2
+                height: dayLabel.height + workingTimeDay.height + breakTimeDay.height
+
+                Label {
+                    id: dayLabel
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    width: parent.width * 2/3
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeVerySmall
+                    text: qsTr("Day")
+                }
+
+                Label {
+                    id: workingTimeDay
+                    anchors.top: dayLabel.bottom
+                    anchors.left: parent.left
+                    anchors.right: dayLabel.right
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeExtraLarge
+                    text: "03:23:13"
+                }
+
+                Label {
+                    id: breakTimeDay
+                    anchors.top: parent.top
+                    anchors.left: parent.left
+                    anchors.right: dayLabel.right
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeMedium
+                    text: "00:12:04"
+                }
+
+                Label {
+                    id: weekLabel
+                    anchors.top: parent.top
+                    anchors.left: dayLabel.right
+                    anchors.right: parent.right
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeVerySmall
+                    text: qsTr("Week")
+                }
+
+                Label {
+                    id: workingTimeWeek
+                    anchors.top: weekLabel.bottom
+                    anchors.left: weekLabel.left
+                    anchors.right: parent.right
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeMedium
+                    text: "13:20"
+                }
+
+                Label {
+                    id: monthLabel
+                    anchors.top: workingTimeWeek.bottom
+                    anchors.left: weekLabel.left
+                    anchors.right: parent.right
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeVerySmall
+                    text: qsTr("Month")
+                }
+
+                Label {
+                    id: workingTimeMonth
+                    anchors.top: monthLabel.bottom
+                    anchors.left: weekLabel.left
+                    anchors.right: parent.right
+                    horizontalAlignment: Text.AlignHCenter
+                    font.pixelSize: Theme.fontSizeMedium
+                    text: "124:37"
+                }
+            }
+
+            SectionHeader {
                 text: qsTr("Begin and end of work unit")
             }
 
