@@ -105,6 +105,7 @@ ApplicationWindow
         triggeredOnStart: true
         onTriggered: {
             coverPage.setWorkingTime(Global.getWorkingTime())
+            mainPage.setWorkingTime(Global.getWorkingTime())
             coverPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
         }
     }

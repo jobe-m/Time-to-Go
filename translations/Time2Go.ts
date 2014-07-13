@@ -43,6 +43,22 @@
         <source>Begin and end of break(s)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Time spend on active project</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Day</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Week</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Month</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReportPage</name>

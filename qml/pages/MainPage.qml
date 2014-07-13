@@ -56,6 +56,23 @@ Page {
         endTime.text = value
     }
 
+    // This function set working time in seconds
+    function setWorkingTime(value) {
+        if (state === "CHECKED_IN") {
+            __workingTime = value
+            var sec = value
+            var min = (sec/60).toFixedDown(0)
+            var hour = (min/60).toFixedDown(0)
+            workingTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
+                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+        }
+    }
+
+    // internal
+    property int __maxWorkingTime: 60*60*9999 // in seconds
+    property int __workingTime: 0 // in seconds
+
     SilicaFlickable {
         anchors.fill: parent
 
@@ -153,7 +170,7 @@ Page {
                     anchors.left: parent.left
                     width: parent.width * 2/3
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Theme.fontSizeVerySmall
+                    font.pixelSize: Theme.fontSizeExtraSmall
                     text: qsTr("Day")
                 }
 
@@ -164,17 +181,21 @@ Page {
                     anchors.right: dayLabel.right
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeExtraLarge
-                    text: "03:23:13"
+                    text: "--:--:--"
+                    color: __workingTime > __maxWorkingTime ?
+                               "red" : (mainPage.state === "CHECKED_IN" ?
+                                            Theme.primaryColor : Theme.secondaryColor)
+
                 }
 
                 Label {
                     id: breakTimeDay
-                    anchors.top: parent.top
+                    anchors.top: workingTimeDay.bottom
                     anchors.left: parent.left
                     anchors.right: dayLabel.right
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeMedium
-                    text: "00:12:04"
+                    text: "--:--:--"
                 }
 
                 Label {
@@ -183,7 +204,7 @@ Page {
                     anchors.left: dayLabel.right
                     anchors.right: parent.right
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Theme.fontSizeVerySmall
+                    font.pixelSize: Theme.fontSizeExtraSmall
                     text: qsTr("Week")
                 }
 
@@ -203,7 +224,7 @@ Page {
                     anchors.left: weekLabel.left
                     anchors.right: parent.right
                     horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Theme.fontSizeVerySmall
+                    font.pixelSize: Theme.fontSizeExtraSmall
                     text: qsTr("Month")
                 }
 
