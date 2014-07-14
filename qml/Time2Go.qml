@@ -107,6 +107,7 @@ ApplicationWindow
             coverPage.setWorkingTime(Global.getWorkingTime())
             mainPage.setWorkingTime(Global.getWorkingTime())
             coverPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
+            mainPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
         }
     }
 

@@ -69,6 +69,40 @@ Page {
         }
     }
 
+    // This function set break time in seconds
+    function setBreakTime(value, automaticBreakTime) {
+        // Check if cover needs to change to auto break state
+        if ((automaticBreakTime > 0 && automaticBreakTime < 60*60*0.5) ||
+                (automaticBreakTime > 60*60*0.5 && automaticBreakTime < 60*60*0.75)) {
+            startAutoBreak()
+        } else if (automaticBreakTime > 0) {
+            stopAutoBreak()
+        }
+
+        if (state === "PAUSED" || state === "AUTO_PAUSED") {
+            var sec = value
+            var min = (sec/60).toFixedDown(0)
+            var hour = (min/60).toFixedDown(0)
+            breakTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
+                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+        }
+    }
+
+    // This function changes the main page into automatic paused state.
+    function startAutoBreak() {
+        if (state === "CHECKED_IN") {
+            state = "AUTO_PAUSED"
+        }
+    }
+
+    // This function recovers the main page from automatic paused and sets it back to checked in state.
+    function stopAutoBreak() {
+        if (state === "AUTO_PAUSED") {
+            state = "CHECKED_IN"
+        }
+    }
+
     // internal
     property int __maxWorkingTime: 60*60*9999 // in seconds
     property int __workingTime: 0 // in seconds
@@ -185,7 +219,6 @@ Page {
                     color: __workingTime > __maxWorkingTime ?
                                "red" : (mainPage.state === "CHECKED_IN" ?
                                             Theme.primaryColor : Theme.secondaryColor)
-
                 }
 
                 Label {
