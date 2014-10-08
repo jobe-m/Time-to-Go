@@ -117,19 +117,14 @@ CoverBackground {
     width: Theme.coverSizeLarge.width
     height: Theme.coverSizeLarge.height
 
-    Rectangle {
-        anchors.fill: parent
-        color: Theme.rgba(Theme.highlightColor, 0.2)
-
-        Image {
-            width: parent.width * 0.85
-            height: width
-            anchors.top: parent.top
-            anchors.right: parent.right
+    Image {
+        width: parent.width * 0.85
+        height: width
+        anchors.top: parent.top
+        anchors.right: parent.right
 // TODO add background image
-//            source: "../../wallicons/cover-clock.png"
-            opacity: 0.2
-        }
+//        source: "../../wallicons/cover-clock.png"
+        opacity: 0.2
     }
 
     Timer {
