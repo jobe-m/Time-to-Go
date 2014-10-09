@@ -24,17 +24,17 @@
 include(src/dbQueryPlugin/dbQueryPlugin.pri)
 
 # Get release version from .spec file and paste it further to c++ through a define
-isEmpty(VERSION) {
-    GIT_TAG = $$system(git describe --tags --abbrev=0)
-    GIT_VERSION = $$find(GIT_TAG, ^\\d+(\\.\\d+)?(\\.\\d+)?$)
-    isEmpty(GIT_VERSION) {
-        # Taking git tag as fallback but this shouldn't really happen
-        warning("Can't find a valid git tag version, got: $$GIT_TAG")
-        GIT_VERSION = 0.0.0
-    }
-    !isEmpty(GIT_VERSION): VERSION = $$GIT_VERSION
-}
-DEFINES += PROGRAMVERSION=\\\"$$VERSION\\\"
+#isEmpty(VERSION) {
+#    GIT_TAG = $$system(git describe --tags --abbrev=0)
+#    GIT_VERSION = $$find(GIT_TAG, ^\\d+(\\.\\d+)?(\\.\\d+)?$)
+#    isEmpty(GIT_VERSION) {
+#        # Taking git tag as fallback but this shouldn't really happen
+#        warning("Can't find a valid git tag version, got: $$GIT_TAG")
+#        GIT_VERSION = 0.0.0
+#    }
+#    !isEmpty(GIT_VERSION): VERSION = $$GIT_VERSION
+#}
+#DEFINES += PROGRAMVERSION=\\\"$$VERSION\\\"
 
 # The name of the app
 # NOTICE: name defined in TARGET has a corresponding QML filename.

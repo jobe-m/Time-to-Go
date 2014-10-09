@@ -35,10 +35,10 @@ int main(int argc, char *argv[])
     app->setOrganizationName(orgName);
     app->setApplicationName(appName);
 
-    // @uri harbour.time2go.dbQueryPlugin
+    // @uri harbour.Time2Go.DatabaseQuery
     const char* uri("harbour.Time2Go.DatabaseQuery");
     // make the following classes available in QML
-    qmlRegisterSingletonType<DatabaseQueryPlugin>(uri, 1, 0, "DatabaseQuery", DatabaseQueryPlugin::qmlInstance);
+    qmlRegisterSingletonType<DatabaseQueryPlugin>(uri, 1, 0, "Time2GoDatabase", DatabaseQueryPlugin::qmlInstance);
 
     // Setup some class as context properties and make them accessible in QML
 //    QScopedPointer<Time2GoHelper> helper(new Time2GoHelper());

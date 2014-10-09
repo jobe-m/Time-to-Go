@@ -24,7 +24,33 @@
 QObject * DatabaseQueryPlugin::m_instance = 0;
 
 DatabaseQueryPlugin::DatabaseQueryPlugin(QObject* parent) :
-    QObject(parent)
+    QObject(parent),
+    m_dbQueryExecutor(NULL)
 {
+    m_dbQueryExecutor = QueryExecutor::GetInstance();
+    connect(m_dbQueryExecutor, SIGNAL(actionDone(QVariant)), this, SLOT(dbQueryResults(QVariant)));
+}
 
+DatabaseQueryPlugin::~DatabaseQueryPlugin()
+{
+    if (m_dbQueryExecutor) delete m_dbQueryExecutor;
+}
+
+void DatabaseQueryPlugin::saveWorkUnit(QVariantMap &data)
+{
+    data["type"] = QueryType::SetWorkUnit;
+    m_dbQueryExecutor->queueAction(data);
+}
+
+void DatabaseQueryPlugin::dbQueryResults(QVariant &data)
+{
+    QVariantMap reply = data.toMap();
+    int type = reply["type"].toInt();
+
+    switch (type) {
+    case QueryType::SetWorkUnit: {
+        Q_EMIT workUnitSaved(reply);
+        break;
+    }
+    }
 }

@@ -24,11 +24,13 @@
 
 #include <QObject>
 #include <QQmlEngine>
+#include "QueryExecutor.h"
 
 class DatabaseQueryPlugin: public QObject
 {
     Q_OBJECT
     Q_DISABLE_COPY(DatabaseQueryPlugin)
+
 public:
     static QObject *qmlInstance(QQmlEngine *engine, QJSEngine *scriptEngine) {
         Q_UNUSED(engine)
@@ -40,13 +42,24 @@ public:
         return m_instance;
     }
 
-    virtual ~DatabaseQueryPlugin() {}
+    virtual ~DatabaseQueryPlugin();
+
+signals:
+    void workUnitSaved(QVariantMap &data);
+
+public slots:
+    // in QML call with saveWorkUnit({id: 0, project: 1, start: xxx, end: 0, notes: ""})
+    void saveWorkUnit(QVariantMap &data);
+
+private slots:
+    void dbQueryResults(QVariant &data);
 
 private:
     DatabaseQueryPlugin(QObject* parent = 0);
 
 private:
     static QObject* m_instance;
+    QueryExecutor* m_dbQueryExecutor;
 };
 
 #endif
