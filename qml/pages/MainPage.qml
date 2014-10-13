@@ -8,6 +8,8 @@ import "../scripts/Global.js" as Global
 Page {
     id: mainPage
 
+    property alias activeProjectId: time2GoActiveProject.projectId
+
     function checkIn(value) {
         state = "CHECKED_IN"
         var date = new Date(value)
@@ -44,9 +46,9 @@ Page {
         state = "CHECKED_IN"
     }
 
-    function setActiveProject(value) {
-        activeProjectLabel.text = value
-    }
+//    function setActiveProject(value) {
+//        activeProjectLabel.text = value
+//    }
 
     function setWorkBegin(value) {
         beginTime.text = value
@@ -106,6 +108,32 @@ Page {
     // internal
     property int __maxWorkingTime: 60*60*9999 // in seconds
     property int __workingTime: 0 // in seconds
+
+    Time2GoActiveProject {
+        id: time2GoActiveProject
+    }
+
+    Time2GoWorkUnit {
+        id: time2GoWorkUnit
+        activeProject: time2GoActiveProject.uid
+    }
+
+    Time2GoBreaksListModel {
+        id: time2GoBreaksListModel
+        activeWorkUnit: time2GoWorkUnit.uid
+    }
+
+    Time2GoWorkingTimeDay {
+
+    }
+
+    Time2GoWorkingTimeWeek {
+
+    }
+
+    Time2GoWorkingTimeMonth {
+
+    }
 
     SilicaFlickable {
         anchors.fill: parent
@@ -187,6 +215,7 @@ Page {
                 horizontalAlignment: Text.AlignHCenter
                 font.pixelSize: Theme.fontSizeExtraLarge
                 wrapMode: Text.WrapAtWordBoundaryOrAnywhere
+                text: time2GoActiveProject.name
             }
 
             SectionHeader {

@@ -19,55 +19,43 @@
 **
 ***************************************************************************/
 
-#ifndef DATABASEQUERYPLUGIN_H
-#define DATABASEQUERYPLUGIN_H
+#ifndef TIME2GOPROJECT_H
+#define TIME2GOPROJECT_H
 
 #include <QObject>
-#include <QQmlEngine>
 #include "QueryExecutor.h"
 
-class DatabaseQueryPlugin: public QObject
+class Time2GoProject : public QObject
 {
     Q_OBJECT
-    Q_DISABLE_COPY(DatabaseQueryPlugin)
-
 public:
-    static QObject *qmlInstance(QQmlEngine *engine, QJSEngine *scriptEngine) {
-        Q_UNUSED(engine)
-        Q_UNUSED(scriptEngine)
+    Q_PROPERTY(int uid READ uid WRITE setUid NOTIFY uidChanged)
+    Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 
-        if(!m_instance) {
-            m_instance = new DatabaseQueryPlugin();
-        }
-        return m_instance;
-    }
+    explicit Time2GoProject(QObject *parent = 0);
+    virtual ~Time2GoProject();
 
-    virtual ~DatabaseQueryPlugin();
-
+    const int uid() { return m_uid; }
+    void setUid(const int value);
+    const QString name() { return m_name; }
+    void setName(const QString &value);
 signals:
-    // to QML
-    void projectSaved(QVariantMap reply);
-    void workUnitSaved(QVariantMap reply);
-    void latestWorkUnitLoaded(QVariant reply);
+    void uidChanged();
+    void nameChanged();
+    void dbQueryError(const QString errorText);
 
 public slots:
-    // from QML
-    // in QML call saveProject({id: 0, name: any project name})
-    void saveProject(QVariantMap data);
-    // in QML call saveWorkUnit({id: 0, project: 1, start: xxx, end: 0, notes: ""})
-    void saveWorkUnit(QVariantMap data);
-    void loadLatestWorkUnit();
 
 private slots:
     // from query executor
-    void dbQueryResults(QVariant data);
+    void dbQueryResults(QVariant query);
 
 private:
-    DatabaseQueryPlugin(QObject* parent = 0);
-
-private:
-    static QObject* m_instance;
     QueryExecutor* m_dbQueryExecutor;
+    int m_salt;
+
+    int m_uid;
+    QString m_name;
 };
 
-#endif
+#endif // TIME2GOPROJECT_H

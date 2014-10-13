@@ -22,6 +22,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.Time2Go.DatabaseQuery 1.0
 import "pages"
 import "cover"
 import "common"
@@ -36,7 +37,10 @@ ApplicationWindow
 
     // application global properties and functions
     function checkIn() {
-        Global.setWorkingStart()
+        var workingStart = new Date()
+        // save to database
+        Time2GoDatabase.saveWorkUnit({id: 0, project: 1, start: workingStart, end: 0, notes: ""})
+        Global.setWorkingStart(workingStart)
         coverPage.checkIn()
         mainPage.checkIn(Global.getWorkBeginTime())
         uiUpdateTimer.restart()
@@ -74,6 +78,18 @@ ApplicationWindow
 
     initialPage: mainPageContainer
     cover: coverPage
+
+    Connections {
+        target: Time2GoDatabase
+        onWorkUnitSaved: {
+            console.log("OnWorkUnitSaved: reply id: " + reply["id"] + " done: " + reply["done"] +" error: " + reply["error"])
+        }
+        onLatestWorkUnitLoaded: {
+            console.log("onLatestWorkUnitLoaded: reply id: " + reply["id"] + " done: " +
+                        reply["done"] +" start: " + reply["start"] + " end: " + reply["end"])
+            Global.setWorkingStart(new Date(reply["start"]))
+        }
+    }
 
     // Place info popup outside of page stack so that it is shown over all
     // application UI elements
@@ -119,5 +135,8 @@ ApplicationWindow
         coverPage.setWorkingTime(Global.getWorkingTime())
         coverPage.setBreakTime(Global.getBreakTime())
         mainPage.setActiveProject(Global.getActiveProject())
+
+        // Load latest work unit
+        Time2GoDatabase.loadLatestWorkUnit();
     }
 }

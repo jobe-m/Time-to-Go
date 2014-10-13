@@ -19,6 +19,7 @@
 **
 ***************************************************************************/
 
+#include <QDebug>
 #include "DatabaseQueryPlugin.h"
 
 QObject * DatabaseQueryPlugin::m_instance = 0;
@@ -36,13 +37,25 @@ DatabaseQueryPlugin::~DatabaseQueryPlugin()
     if (m_dbQueryExecutor) delete m_dbQueryExecutor;
 }
 
-void DatabaseQueryPlugin::saveWorkUnit(QVariantMap &data)
+void DatabaseQueryPlugin::saveProject(QVariantMap data)
+{
+}
+
+void DatabaseQueryPlugin::saveWorkUnit(QVariantMap data)
 {
     data["type"] = QueryType::SetWorkUnit;
+    qDebug() << "saveWorkUnit: " << data;
     m_dbQueryExecutor->queueAction(data);
 }
 
-void DatabaseQueryPlugin::dbQueryResults(QVariant &data)
+void DatabaseQueryPlugin::loadLatestWorkUnit()
+{
+    QVariantMap data;
+    data["type"] = QueryType::GetLatestWorkUnit;
+    m_dbQueryExecutor->queueAction(data);
+}
+
+void DatabaseQueryPlugin::dbQueryResults(QVariant data)
 {
     QVariantMap reply = data.toMap();
     int type = reply["type"].toInt();
@@ -50,6 +63,10 @@ void DatabaseQueryPlugin::dbQueryResults(QVariant &data)
     switch (type) {
     case QueryType::SetWorkUnit: {
         Q_EMIT workUnitSaved(reply);
+        break;
+    }
+    case QueryType::GetLatestWorkUnit: {
+        Q_EMIT latestWorkUnitLoaded(reply);
         break;
     }
     }

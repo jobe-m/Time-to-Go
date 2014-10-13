@@ -1,4 +1,5 @@
 .pragma library
+//.import harbour.Time2Go.DatabaseQuery 1.0 as dbQuery
 
 // Constants used by infoBanner type
 var none = 0
@@ -18,9 +19,9 @@ var activeProject = "My amusing project"
 var ms = 1000
 var automaticBreakTime = 0
 
-function setWorkingStart() {
+function setWorkingStart(value) {
     if (!working && !paused) {
-        workingStart = new Date()
+        workingStart = value
         working = true
         paused = false
     }
@@ -50,9 +51,9 @@ function setWorkingEnd() {
     }
 }
 
-function setBreakStart() {
+function setBreakStart(value) {
     if (!paused && working) {
-        breakStart = new Date()
+        breakStart = value
         working = false
         paused = true
     }

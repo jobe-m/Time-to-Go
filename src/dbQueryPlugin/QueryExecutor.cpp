@@ -9,10 +9,10 @@ QueryExecutor::QueryExecutor(QObject *parent) :
 {
     m_worker.setCallObject(this);
 
-    db = QSqlDatabase::database();
-    if (!db.isOpen()) {
+    m_db = QSqlDatabase::database();
+    if (!m_db.isOpen()) {
         qDebug() << "QE Opening database";
-        db = QSqlDatabase::addDatabase("QSQLITE");
+        m_db = QSqlDatabase::addDatabase("QSQLITE");
 
         QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
         QString dataFile = QString("%1/database.db").arg(dataDir);
@@ -21,9 +21,9 @@ QueryExecutor::QueryExecutor(QObject *parent) :
         if (!dir.exists())
             dir.mkpath(dataDir);
         qDebug() << "DB Dir:" << dataDir;
-        db.setDatabaseName(dataFile);
-        qDebug() << "DB Name:" << db.databaseName();
-        if (db.open())
+        m_db.setDatabaseName(dataFile);
+        qDebug() << "DB Name:" << m_db.databaseName();
+        if (m_db.open())
             qDebug() << "QE opened database";
         else
             qWarning() << "QE failed to open database";
@@ -31,18 +31,33 @@ QueryExecutor::QueryExecutor(QObject *parent) :
     else {
         qWarning() << "QE used existing DB connection!";
     }
-
-    if (db.isOpen()) {
-        if (!db.tables().contains("projects")) {
-            db.exec("CREATE TABLE projects (id INTEGER PRIMARY KEY, name TEXT);");
+/*
+    // DEBUG: delete outdated database tables
+    if (m_db.isOpen()) {
+        m_db.exec("DROP TABLE IF EXISTS settings");
+        m_db.exec("DROP TABLE IF EXISTS projects");
+        m_db.exec("DROP TABLE IF EXISTS workunits");
+        m_db.exec("DROP TABLE IF EXISTS breaks");
+    }
+*/
+    if (m_db.isOpen()) {
+//        if (!m_db.tables().contains("settings")) {
+            m_db.exec("CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
+                    "setting INTEGER);");
+//        }
+        if (!m_db.tables().contains("projects")) {
+            m_db.exec("CREATE TABLE projects (id INTEGER PRIMARY KEY, name TEXT, "
+                      "reserved INTEGER);");
+            // create one default group
+            m_db.exec("INSERT INTO projects VALUES (NULL, my awesome project, 0);");
         }
-        if (!db.tables().contains("workunits")) {
-            db.exec("CREATE TABLE workunits (id INTEGER PRIMARY KEY, "
-                    "project INTEGER, start DATE, end DATE, notes TEXT);");
+        if (!m_db.tables().contains("workunits")) {
+            m_db.exec("CREATE TABLE workunits (id INTEGER PRIMARY KEY, project INTEGER, "
+                    "start DATE, end DATE, notes TEXT, reserved INTEGER);");
         }
-        if (!db.tables().contains("breaks")) {
-            db.exec("CREATE TABLE breaks (id INTEGER PRIMARY KEY, "
-                    "workunit INTEGER, start DATE, end DATE, notes TEXT);");
+        if (!m_db.tables().contains("breaks")) {
+            m_db.exec("CREATE TABLE breaks (id INTEGER PRIMARY KEY, workunit INTEGER, "
+                    "start DATE, end DATE, notes TEXT, reserved INTEGER);");
         }
     }
 }
@@ -61,25 +76,83 @@ void QueryExecutor::processQuery(const QVariant &msg)
     qDebug() << "QE Processing query:" << query["type"];
     if (!query.isEmpty()) {
         switch (query["type"].toInt()) {
-        case QueryType::SetWorkUnit: {
-            setWorkUnit(query);
-            break;
-        }
-        default: {
-            break;
-        }
+        case QueryType::GetProject: { getProject(query); break; }
+        case QueryType::SetProject: { setProject(query); break; }
+        case QueryType::SetWorkUnit: { setWorkUnit(query); break; }
+        case QueryType::GetLatestWorkUnit: { getLatestWorkUnit(query); break; }
+        default: { break; }
         }
     }
 }
 
-void QueryExecutor::setWorkUnit(QVariantMap &query)
+void QueryExecutor::getProject(QVariantMap query)
 {
-    QSqlQuery sql(db);
+    QSqlQuery sql(m_db);
+    query["done"] = false;
+    if (0 != query["id"].toInt()) {
+        sql.prepare("SELECT name FROM projects where id=(:id);");
+        sql.bindValue(":id", query["id"].toInt());
+        sql.exec();
+        if (sql.lastError().type() == QSqlError::NoError ) {
+            if (sql.next()) {
+                // Update query with project details
+                query["id"] = sql.value(0).toInt();
+                query["name"] = sql.value(1).toString();
+            } else {
+                query["error"] = QString("Project with UID %1 not found in database. Strange.").arg(query["id"].toInt());
+            }
+        } else {
+            query["error"] = sql.lastError().text();
+        }
+    }
+    // Send result back to QML world
+    Q_EMIT actionDone(query);
+}
+
+void QueryExecutor::setProject(QVariantMap query)
+{
+    QSqlQuery sql(m_db);
+    // Set response to not done
+    query["done"] = false;
+    // id is used to determine if we need to create a new table entry or if we should modify an existing table entry
+    int id = query["id"].toInt();
+    if (0 == id) {
+        // Create new project
+        sql.prepare("INSERT INTO projects VALUES (NULL, :name, 0);");
+        sql.bindValue(":name", query["name"]);
+        sql.exec();
+        if (sql.lastError().type() == QSqlError::NoError ) {
+            // Update id in query
+            query["id"] = sql.lastInsertId();
+            // or if lastInsertId is not working do: "SELECT max(id) FROM workunits;"
+            query["done"] = true;
+        } else {
+            query["error"] = sql.lastError().text();
+        }
+    } else {
+        // Update existing project
+        sql.prepare("UPDATE projects SET name=(:name), reserved=0 WHERE id=(:id);");
+        sql.bindValue(":name", query["name"]);
+        sql.bindValue("id", query["id"]);
+        sql.exec();
+        if (sql.lastError().type() == QSqlError::NoError) {
+            query["done"] = true;
+        } else {
+            query["error"] = sql.lastError().text();
+        }
+    }
+    // Send result back to QML world
+    Q_EMIT actionDone(query);
+}
+
+void QueryExecutor::setWorkUnit(QVariantMap query)
+{
+    QSqlQuery sql(m_db);
     query["done"] = false;
     int id = query["id"].toInt();
     if (0 == id) {
         // Create new work unit
-        sql.prepare("INSERT INTO contacts VALUES (NULL, :project, :start, :end, :notes);");
+        sql.prepare("INSERT INTO workunits VALUES (NULL, :project, :start, :end, :notes, 0);");
         sql.bindValue(":project", query["project"]);
         sql.bindValue(":start", query["start"]);
         sql.bindValue(":end", query["end"]);
@@ -88,14 +161,14 @@ void QueryExecutor::setWorkUnit(QVariantMap &query)
         if (sql.lastError().type() == QSqlError::NoError ) {
             // Update id in query
             query["id"] = sql.lastInsertId();
-            // or if not working do: "SELECT max(id) FROM workunits;"
+            // or if lastInsertId is not working do: "SELECT max(id) FROM workunits;"
             query["done"] = true;
         } else {
             query["error"] = sql.lastError().text();
         }
     } else {
         // Update existing work unit
-        sql.prepare("UPDATE workunits SET project=(:project), start=(:start), end=(:end), notes=(:notes)  WHERE id=(:id);");
+        sql.prepare("UPDATE workunits SET project=(:project), start=(:start), end=(:end), notes=(:notes), reserved=0  WHERE id=(:id);");
         sql.bindValue(":project", query["project"]);
         sql.bindValue(":start", query["start"]);
         sql.bindValue(":end", query["end"]);
@@ -108,7 +181,29 @@ void QueryExecutor::setWorkUnit(QVariantMap &query)
             query["error"] = sql.lastError().text();
         }
     }
+    // Send result back to QML world
+    Q_EMIT actionDone(query);
+}
 
+void QueryExecutor::getLatestWorkUnit(QVariantMap query)
+{
+    QSqlQuery sql("SELECT * FROM workunits ORDER BY datetime(start) DESC LIMIT 1;", m_db);
+    if (sql.next()) {
+        query["id"] = sql.value(0);
+        qDebug() << sql.value(0);
+        query["project"] = sql.value(1);
+        qDebug() << sql.value(1);
+        query["start"] = sql.value(2);
+        qDebug() << sql.value(2);
+        query["end"] = sql.value(3);
+        qDebug() << sql.value(3);
+        query["notes"] = sql.value(4);
+        qDebug() << sql.value(4);
+        query["done"] = true;
+    } else {
+        query["done"] = false;
+    }
+    // Send result back to QML world
     Q_EMIT actionDone(query);
 }
 
