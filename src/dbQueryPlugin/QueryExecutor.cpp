@@ -31,25 +31,24 @@ QueryExecutor::QueryExecutor(QObject *parent) :
     else {
         qWarning() << "QE used existing DB connection!";
     }
-/*
-    // DEBUG: delete outdated database tables
+
     if (m_db.isOpen()) {
+/*
+        // DEBUG: delete outdated database tables
         m_db.exec("DROP TABLE IF EXISTS settings");
         m_db.exec("DROP TABLE IF EXISTS projects");
         m_db.exec("DROP TABLE IF EXISTS workunits");
         m_db.exec("DROP TABLE IF EXISTS breaks");
-    }
 */
-    if (m_db.isOpen()) {
-//        if (!m_db.tables().contains("settings")) {
-            m_db.exec("CREATE TABLE IF NOT EXISTS settings (id INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
+        if (!m_db.tables().contains("settings")) {
+            m_db.exec("CREATE TABLE settings (id INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
                     "setting INTEGER);");
-//        }
+        }
         if (!m_db.tables().contains("projects")) {
             m_db.exec("CREATE TABLE projects (id INTEGER PRIMARY KEY, name TEXT, "
                       "reserved INTEGER);");
             // create one default group
-            m_db.exec("INSERT INTO projects VALUES (NULL, my awesome project, 0);");
+            m_db.exec("INSERT INTO projects VALUES (NULL, \"my awesome project\", 0);");
         }
         if (!m_db.tables().contains("workunits")) {
             m_db.exec("CREATE TABLE workunits (id INTEGER PRIMARY KEY, project INTEGER, "
@@ -90,7 +89,7 @@ void QueryExecutor::getProject(QVariantMap query)
     QSqlQuery sql(m_db);
     query["done"] = false;
     if (0 != query["id"].toInt()) {
-        sql.prepare("SELECT name FROM projects where id=(:id);");
+        sql.prepare("SELECT * FROM projects WHERE id=(:id);");
         sql.bindValue(":id", query["id"].toInt());
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError ) {
@@ -98,6 +97,7 @@ void QueryExecutor::getProject(QVariantMap query)
                 // Update query with project details
                 query["id"] = sql.value(0).toInt();
                 query["name"] = sql.value(1).toString();
+                query["done"] = true;
             } else {
                 query["error"] = QString("Project with UID %1 not found in database. Strange.").arg(query["id"].toInt());
             }

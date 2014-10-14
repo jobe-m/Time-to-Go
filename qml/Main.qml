@@ -72,8 +72,8 @@ ApplicationWindow
         } else {
             Global.activateProject(value);
         }
-        coverPage.setActiveProject(Global.getActiveProject())
-        mainPage.setActiveProject(Global.getActiveProject())
+//        coverPage.setActiveProject(Global.getActiveProject())
+//        mainPage.setActiveProject(Global.getActiveProject())
     }
 
     initialPage: mainPageContainer
@@ -101,6 +101,7 @@ ApplicationWindow
         id: mainPageContainer
         MainPage {
             id: mainPageObj
+            activeProjectUid: 1
             Component.onCompleted: mainPage = mainPageObj
         }
     }
@@ -131,10 +132,10 @@ ApplicationWindow
         // initialize cover page
 // TODO set from settings
         coverPage.setMaxWorkingTime(60*60*10) // set to 10 hours
-        coverPage.setActiveProject(Global.getActiveProject())
+//        coverPage.setActiveProject(Global.getActiveProject())
         coverPage.setWorkingTime(Global.getWorkingTime())
         coverPage.setBreakTime(Global.getBreakTime())
-        mainPage.setActiveProject(Global.getActiveProject())
+//        mainPage.setActiveProject(Global.getActiveProject())
 
         // Load latest work unit
         Time2GoDatabase.loadLatestWorkUnit();

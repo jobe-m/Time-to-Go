@@ -19,6 +19,7 @@
 **
 ***************************************************************************/
 
+#include <QDebug>
 #include "Time2GoProject.h"
 #include "QueryExecutor.h"
 
@@ -70,6 +71,7 @@ void Time2GoProject::dbQueryResults(QVariant query)
     if (m_salt == reply["salt"].toInt()) {
         switch (reply["type"].toInt()) {
         case QueryType::GetProject: {
+            qDebug() << "GetProject: " << reply;
             if (reply["done"].toBool()) {
                 m_uid = reply["id"].toInt();
                 m_name = reply["name"].toString();

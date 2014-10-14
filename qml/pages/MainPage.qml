@@ -1,6 +1,7 @@
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.Time2Go.DatabaseQuery 1.0
 import "../common"
 import "../scripts/Global.js" as Global
 
@@ -8,7 +9,7 @@ import "../scripts/Global.js" as Global
 Page {
     id: mainPage
 
-    property alias activeProjectId: time2GoActiveProject.projectId
+    property alias activeProjectUid: time2GoActiveProject.uid
 
     function checkIn(value) {
         state = "CHECKED_IN"
@@ -109,31 +110,32 @@ Page {
     property int __maxWorkingTime: 60*60*9999 // in seconds
     property int __workingTime: 0 // in seconds
 
-    Time2GoActiveProject {
+    Time2GoProject {
         id: time2GoActiveProject
+
+        onDbQueryError: {
+            console.log("Time2GoProject error: " + errorText)
+        }
     }
 
-    Time2GoWorkUnit {
-        id: time2GoWorkUnit
-        activeProject: time2GoActiveProject.uid
-    }
+//    Time2GoWorkUnit {
+//        id: time2GoWorkUnit
+//        activeProject: time2GoActiveProject.uid
+//    }
 
-    Time2GoBreaksListModel {
-        id: time2GoBreaksListModel
-        activeWorkUnit: time2GoWorkUnit.uid
-    }
+//    Time2GoBreaksListModel {
+//        id: time2GoBreaksListModel
+//        activeWorkUnit: time2GoWorkUnit.uid
+//    }
 
-    Time2GoWorkingTimeDay {
+//    Time2GoWorkingTimeDay {
+//    }
 
-    }
+//    Time2GoWorkingTimeWeek {
+//    }
 
-    Time2GoWorkingTimeWeek {
-
-    }
-
-    Time2GoWorkingTimeMonth {
-
-    }
+//    Time2GoWorkingTimeMonth {
+//    }
 
     SilicaFlickable {
         anchors.fill: parent

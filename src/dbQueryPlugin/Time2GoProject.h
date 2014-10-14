@@ -35,7 +35,7 @@ public:
     explicit Time2GoProject(QObject *parent = 0);
     virtual ~Time2GoProject();
 
-    const int uid() { return m_uid; }
+    int uid() { return m_uid; }
     void setUid(const int value);
     const QString name() { return m_name; }
     void setName(const QString &value);

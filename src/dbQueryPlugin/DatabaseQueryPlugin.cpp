@@ -39,12 +39,13 @@ DatabaseQueryPlugin::~DatabaseQueryPlugin()
 
 void DatabaseQueryPlugin::saveProject(QVariantMap data)
 {
+    Q_UNUSED(data)
 }
 
 void DatabaseQueryPlugin::saveWorkUnit(QVariantMap data)
 {
     data["type"] = QueryType::SetWorkUnit;
-    qDebug() << "saveWorkUnit: " << data;
+//    qDebug() << "saveWorkUnit: " << data;
     m_dbQueryExecutor->queueAction(data);
 }
 
