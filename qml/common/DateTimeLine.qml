@@ -10,6 +10,25 @@ Item {
     signal startChanged(date dateTime)
     signal endChanged(date dateTime)
 
+    function reset() {
+        startYear = 0
+        startMonth = 0
+        startDay = 0
+        startHour = 0
+        startMin = 0
+        startSec = 0
+        endYear = 0
+        endMonth = 0
+        endDay = 0
+        endHour = 0
+        endMin = 0
+        endSec = 0
+        startDate.text = "--/--"
+        startTime.text = showSec ? "--:--:--" : "--:--"
+        endDate.text = "--/--"
+        endTime.text = showSec ? "--:--:--" : "--:--"
+    }
+
     function setStartDateTime(value) {
         startYear = value.getFullYear()
         startMonth = value.getMonth() + 1
@@ -137,7 +156,7 @@ Item {
         anchors.right: timeIcon.left
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: Theme.fontSizeMedium
-        text: dateTimeLine.showSec ? "--:--:--" : "--:--"
+        text: showSec ? "--:--:--" : "--:--"
 
         MouseArea {
             anchors.fill: parent
@@ -181,7 +200,7 @@ Item {
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: Theme.fontSizeMedium
-        text: dateTimeLine.showSec ? "--:--:--" : "--:--"
+        text: showSec ? "--:--:--" : "--:--"
 
         MouseArea {
             anchors.fill: parent

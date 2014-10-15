@@ -37,6 +37,7 @@ public:
     Q_PROPERTY(bool validStartDateTime READ validStartDateTime)
     Q_PROPERTY(bool validEndDateTime READ validEndDateTime)
 
+    Q_INVOKABLE void reset();
     Q_INVOKABLE void save();
 
     explicit Time2GoWorkUnit(QObject *parent = 0);

@@ -14,7 +14,10 @@ Page {
     function checkIn(value) {
         state = "CHECKED_IN"
         var now = new Date()
+        workDateTimeLine.reset()
         workDateTimeLine.setStartDateTime(now)
+        time2GoWorkUnit.reset()
+        time2GoWorkUnit.projectUid = time2GoActiveProject.uid
         time2GoWorkUnit.start = now
         time2GoWorkUnit.save()
     }

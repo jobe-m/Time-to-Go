@@ -134,3 +134,12 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
         }
     }
 }
+
+void Time2GoWorkUnit::reset()
+{
+    m_uid = 0;
+    m_project_uid = 0;
+    m_start = QDateTime();
+    m_end = QDateTime();
+    m_notes = "";
+}
