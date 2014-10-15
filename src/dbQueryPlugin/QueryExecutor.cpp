@@ -33,29 +33,29 @@ QueryExecutor::QueryExecutor(QObject *parent) :
     }
 
     if (m_db.isOpen()) {
-/*
+
         // DEBUG: delete outdated database tables
         m_db.exec("DROP TABLE IF EXISTS settings");
         m_db.exec("DROP TABLE IF EXISTS projects");
         m_db.exec("DROP TABLE IF EXISTS workunits");
         m_db.exec("DROP TABLE IF EXISTS breaks");
-*/
+
         if (!m_db.tables().contains("settings")) {
-            m_db.exec("CREATE TABLE settings (id INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
+            m_db.exec("CREATE TABLE settings (uid INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
                     "setting INTEGER);");
         }
         if (!m_db.tables().contains("projects")) {
-            m_db.exec("CREATE TABLE projects (id INTEGER PRIMARY KEY, name TEXT, "
+            m_db.exec("CREATE TABLE projects (uid INTEGER PRIMARY KEY, name TEXT, "
                       "reserved INTEGER);");
             // create one default group
             m_db.exec("INSERT INTO projects VALUES (NULL, \"my awesome project\", 0);");
         }
         if (!m_db.tables().contains("workunits")) {
-            m_db.exec("CREATE TABLE workunits (id INTEGER PRIMARY KEY, project INTEGER, "
+            m_db.exec("CREATE TABLE workunits (uid INTEGER PRIMARY KEY, projectuid INTEGER, "
                     "start DATE, end DATE, notes TEXT, reserved INTEGER);");
         }
         if (!m_db.tables().contains("breaks")) {
-            m_db.exec("CREATE TABLE breaks (id INTEGER PRIMARY KEY, workunit INTEGER, "
+            m_db.exec("CREATE TABLE breaks (uid INTEGER PRIMARY KEY, workunit INTEGER, "
                     "start DATE, end DATE, notes TEXT, reserved INTEGER);");
         }
     }
@@ -72,34 +72,35 @@ void QueryExecutor::processAction(QVariant message) {
 void QueryExecutor::processQuery(const QVariant &msg)
 {
     QVariantMap query = msg.toMap();
-    qDebug() << "QE Processing query:" << query["type"];
+    qDebug() << "QE Processing query:" << query;
     if (!query.isEmpty()) {
         switch (query["type"].toInt()) {
-        case QueryType::GetProject: { getProject(query); break; }
-        case QueryType::SetProject: { setProject(query); break; }
-        case QueryType::SetWorkUnit: { setWorkUnit(query); break; }
-        case QueryType::GetLatestWorkUnit: { getLatestWorkUnit(query); break; }
+        case QueryType::LoadProject: { loadProject(query); break; }
+        case QueryType::SaveProject: { saveProject(query); break; }
+        case QueryType::LoadWorkUnit: { loadWorkUnit(query); break; }
+        case QueryType::SaveWorkUnit: { saveWorkUnit(query); break; }
+        case QueryType::LoadLatestWorkUnit: { loadLatestWorkUnit(query); break; }
         default: { break; }
         }
     }
 }
 
-void QueryExecutor::getProject(QVariantMap query)
+void QueryExecutor::loadProject(QVariantMap query)
 {
     QSqlQuery sql(m_db);
     query["done"] = false;
-    if (0 != query["id"].toInt()) {
-        sql.prepare("SELECT * FROM projects WHERE id=(:id);");
-        sql.bindValue(":id", query["id"].toInt());
+    if (0 != query["uid"].toInt()) {
+        sql.prepare("SELECT * FROM projects WHERE uid=(:uid);");
+        sql.bindValue(":uid", query["uid"].toInt());
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError ) {
             if (sql.next()) {
                 // Update query with project details
-                query["id"] = sql.value(0).toInt();
+                query["uid"] = sql.value(0).toInt();
                 query["name"] = sql.value(1).toString();
                 query["done"] = true;
             } else {
-                query["error"] = QString("Project with UID %1 not found in database. Strange.").arg(query["id"].toInt());
+                query["error"] = QString("Project with UID %1 not found in database. Strange.").arg(query["uid"].toInt());
             }
         } else {
             query["error"] = sql.lastError().text();
@@ -109,31 +110,31 @@ void QueryExecutor::getProject(QVariantMap query)
     Q_EMIT actionDone(query);
 }
 
-void QueryExecutor::setProject(QVariantMap query)
+void QueryExecutor::saveProject(QVariantMap query)
 {
     QSqlQuery sql(m_db);
     // Set response to not done
     query["done"] = false;
     // id is used to determine if we need to create a new table entry or if we should modify an existing table entry
-    int id = query["id"].toInt();
-    if (0 == id) {
+    int uid = query["uid"].toInt();
+    if (0 == uid) {
         // Create new project
         sql.prepare("INSERT INTO projects VALUES (NULL, :name, 0);");
         sql.bindValue(":name", query["name"]);
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError ) {
-            // Update id in query
-            query["id"] = sql.lastInsertId();
-            // or if lastInsertId is not working do: "SELECT max(id) FROM workunits;"
+            // Update uid in query
+            query["uid"] = sql.lastInsertId();
+            // or if lastInsertId is not working do: "SELECT max(uid) FROM workunits;"
             query["done"] = true;
         } else {
             query["error"] = sql.lastError().text();
         }
     } else {
         // Update existing project
-        sql.prepare("UPDATE projects SET name=(:name), reserved=0 WHERE id=(:id);");
+        sql.prepare("UPDATE projects SET name=(:name), reserved=0 WHERE uid=(:uid);");
         sql.bindValue(":name", query["name"]);
-        sql.bindValue("id", query["id"]);
+        sql.bindValue("uid", query["uid"]);
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError) {
             query["done"] = true;
@@ -145,22 +146,27 @@ void QueryExecutor::setProject(QVariantMap query)
     Q_EMIT actionDone(query);
 }
 
-void QueryExecutor::setWorkUnit(QVariantMap query)
+void QueryExecutor::loadWorkUnit(QVariantMap query)
+{
+
+}
+
+void QueryExecutor::saveWorkUnit(QVariantMap query)
 {
     QSqlQuery sql(m_db);
     query["done"] = false;
-    int id = query["id"].toInt();
-    if (0 == id) {
+    int uid = query["uid"].toInt();
+    if (0 == uid) {
         // Create new work unit
-        sql.prepare("INSERT INTO workunits VALUES (NULL, :project, :start, :end, :notes, 0);");
-        sql.bindValue(":project", query["project"]);
+        sql.prepare("INSERT INTO workunits VALUES (NULL, :projectuid, :start, :end, :notes, 0);");
+        sql.bindValue(":projectuid", query["projectuid"]);
         sql.bindValue(":start", query["start"]);
         sql.bindValue(":end", query["end"]);
         sql.bindValue(":notes", query["notes"]);
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError ) {
-            // Update id in query
-            query["id"] = sql.lastInsertId();
+            // Update uid in query
+            query["uid"] = sql.lastInsertId();
             // or if lastInsertId is not working do: "SELECT max(id) FROM workunits;"
             query["done"] = true;
         } else {
@@ -168,12 +174,12 @@ void QueryExecutor::setWorkUnit(QVariantMap query)
         }
     } else {
         // Update existing work unit
-        sql.prepare("UPDATE workunits SET project=(:project), start=(:start), end=(:end), notes=(:notes), reserved=0  WHERE id=(:id);");
-        sql.bindValue(":project", query["project"]);
+        sql.prepare("UPDATE workunits SET projectuid=(:projectuid), start=(:start), end=(:end), notes=(:notes), reserved=0  WHERE uid=(:uid);");
+        sql.bindValue(":projectuid", query["projectuid"]);
         sql.bindValue(":start", query["start"]);
         sql.bindValue(":end", query["end"]);
         sql.bindValue(":notes", query["notes"]);
-        sql.bindValue(":id", query["id"]);
+        sql.bindValue(":uid", query["uid"]);
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError) {
             query["done"] = true;
@@ -185,13 +191,13 @@ void QueryExecutor::setWorkUnit(QVariantMap query)
     Q_EMIT actionDone(query);
 }
 
-void QueryExecutor::getLatestWorkUnit(QVariantMap query)
+void QueryExecutor::loadLatestWorkUnit(QVariantMap query)
 {
     QSqlQuery sql("SELECT * FROM workunits ORDER BY datetime(start) DESC LIMIT 1;", m_db);
     if (sql.next()) {
-        query["id"] = sql.value(0);
+        query["uid"] = sql.value(0);
         qDebug() << sql.value(0);
-        query["project"] = sql.value(1);
+        query["projectuid"] = sql.value(1);
         qDebug() << sql.value(1);
         query["start"] = sql.value(2);
         qDebug() << sql.value(2);

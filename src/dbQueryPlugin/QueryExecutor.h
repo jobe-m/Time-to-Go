@@ -10,13 +10,13 @@
 
 namespace QueryType {
     enum EnumType {
-        GetProject = 1,
-        SetProject,
-        GetWorkUnit,
-        SetWorkUnit,
-        GetBreak,
-        SetBreak,
-        GetLatestWorkUnit,
+        LoadProject = 1,
+        LoadWorkUnit,
+        LoadBreak,
+        SaveProject,
+        SaveWorkUnit,
+        SaveBreak,
+        LoadLatestWorkUnit,
     };
 }
 
@@ -37,10 +37,11 @@ signals:
 private:
     void processQuery(const QVariant &msg);
 
-    void getProject(QVariantMap query);
-    void setProject(QVariantMap query);
-    void setWorkUnit(QVariantMap query);
-    void getLatestWorkUnit(QVariantMap query);
+    void loadProject(QVariantMap query);
+    void saveProject(QVariantMap query);
+    void loadWorkUnit(QVariantMap query);
+    void saveWorkUnit(QVariantMap query);
+    void loadLatestWorkUnit(QVariantMap query);
 
 private:
     ThreadWorker m_worker;

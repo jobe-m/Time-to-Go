@@ -39,7 +39,7 @@ ApplicationWindow
     function checkIn() {
         var workingStart = new Date()
         // save to database
-        Time2GoDatabase.saveWorkUnit({id: 0, project: 1, start: workingStart, end: 0, notes: ""})
+//        Time2GoDatabase.saveWorkUnit({id: 0, project: 1, start: workingStart, end: 0, notes: ""})
         Global.setWorkingStart(workingStart)
         coverPage.checkIn()
         mainPage.checkIn(Global.getWorkBeginTime())
@@ -79,17 +79,17 @@ ApplicationWindow
     initialPage: mainPageContainer
     cover: coverPage
 
-    Connections {
-        target: Time2GoDatabase
-        onWorkUnitSaved: {
-            console.log("OnWorkUnitSaved: reply id: " + reply["id"] + " done: " + reply["done"] +" error: " + reply["error"])
-        }
-        onLatestWorkUnitLoaded: {
-            console.log("onLatestWorkUnitLoaded: reply id: " + reply["id"] + " done: " +
-                        reply["done"] +" start: " + reply["start"] + " end: " + reply["end"])
-            Global.setWorkingStart(new Date(reply["start"]))
-        }
-    }
+//    Connections {
+//        target: Time2GoDatabase
+//        onWorkUnitSaved: {
+//            console.log("OnWorkUnitSaved: reply id: " + reply["id"] + " done: " + reply["done"] +" error: " + reply["error"])
+//        }
+//        onLatestWorkUnitLoaded: {
+//            console.log("onLatestWorkUnitLoaded: reply id: " + reply["id"] + " done: " +
+//                        reply["done"] +" start: " + reply["start"] + " end: " + reply["end"])
+//            Global.setWorkingStart(new Date(reply["start"]))
+//        }
+//    }
 
     // Place info popup outside of page stack so that it is shown over all
     // application UI elements
@@ -138,6 +138,6 @@ ApplicationWindow
 //        mainPage.setActiveProject(Global.getActiveProject())
 
         // Load latest work unit
-        Time2GoDatabase.loadLatestWorkUnit();
+//        Time2GoDatabase.loadLatestWorkUnit();
     }
 }

@@ -13,30 +13,18 @@ Page {
 
     function checkIn(value) {
         state = "CHECKED_IN"
-        var date = new Date(value)
-        var hour = date.getHours()
-        var min = date.getMinutes()
-        var sec = date.getSeconds()
-        var day = date.getDate()
-        var month = date.getMonth() + 1
-        var year = date.getFullYear()
-
-        workDateTimeLine.setBeginDate(year, month, day)
-        workDateTimeLine.setBeginTime(hour, min, sec)
+        var now = new Date()
+        workDateTimeLine.setStartDateTime(now)
+        time2GoWorkUnit.start = now
+        time2GoWorkUnit.save()
     }
 
     function checkOut(value) {
         state = "CHECKED_OUT"
-        var date = new Date(value)
-        var hour = date.getHours()
-        var min = date.getMinutes()
-        var sec = date.getSeconds()
-        var day = date.getDate()
-        var month = date.getMonth() + 1
-        var year = date.getFullYear()
-
-        workDateTimeLine.setEndDate(year, month, day)
-        workDateTimeLine.setEndTime(hour, min, sec)
+        var now = new Date()
+        workDateTimeLine.setEndDateTime(now)
+        time2GoWorkUnit.end = now
+        time2GoWorkUnit.save()
     }
 
     function startBreak() {
@@ -45,18 +33,6 @@ Page {
 
     function stopBreak() {
         state = "CHECKED_IN"
-    }
-
-//    function setActiveProject(value) {
-//        activeProjectLabel.text = value
-//    }
-
-    function setWorkBegin(value) {
-        beginTime.text = value
-    }
-
-    function setWorkEnd(value) {
-        endTime.text = value
     }
 
     // This function set working time in seconds
@@ -118,10 +94,21 @@ Page {
         }
     }
 
-//    Time2GoWorkUnit {
-//        id: time2GoWorkUnit
-//        activeProject: time2GoActiveProject.uid
-//    }
+    Time2GoWorkUnit {
+        id: time2GoWorkUnit
+        projectUid: time2GoActiveProject.uid
+
+        onStartChanged: {
+            if (validStartDateTime) {
+                workDateTimeLine.setStartDateTime(start)
+            }
+        }
+        onEndChanged: {
+            if (validEndDateTime) {
+                workDateTimeLine.setEndDateTime(end)
+            }
+        }
+    }
 
 //    Time2GoBreaksListModel {
 //        id: time2GoBreaksListModel
@@ -310,20 +297,17 @@ Page {
             DateTimeLine {
                 id: workDateTimeLine
 
-                onBeginDateChanged: {
-                    Global.updateWorkingStartDate(year, month, day)
+                onStartChanged: {
+                    time2GoWorkUnit.start = dateTime
+                    time2GoWorkUnit.save()
+                }
+                onEndChanged: {
+                    time2GoWorkUnit.end = dateTime
+                    time2GoWorkUnit.save()
                 }
 
-                onBeginTimeChanged: {
-                    Global.updateWorkingStartTime(hour, minute)
-                }
-
-                onEndDateChanged: {
-                    Global.updateWorkingEndDate(year, month, day)
-                }
-
-                onEndTimeChanged: {
-                    Global.updateWorkingEndTime(hour, minute)
+                Component.onCompleted: {
+                    console.log("DateTimeLine start: " + time2GoWorkUnit.start.valueOf())
                 }
             }
 

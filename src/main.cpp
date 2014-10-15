@@ -21,8 +21,8 @@
 
 #include <QtQuick>
 #include <sailfishapp.h>
-#include "DatabaseQueryPlugin.h"
 #include "Time2GoProject.h"
+#include "Time2GoWorkUnit.h"
 
 int main(int argc, char *argv[])
 {
@@ -39,9 +39,9 @@ int main(int argc, char *argv[])
     // @uri harbour.Time2Go.DatabaseQuery
     const char* uri("harbour.Time2Go.DatabaseQuery");
     // make the following classes available in QML
-    qmlRegisterSingletonType<DatabaseQueryPlugin>(uri, 1, 0, "Time2GoDatabase", DatabaseQueryPlugin::qmlInstance);
+//    qmlRegisterSingletonType<Time2GoDbSettings>(uri, 1, 0, "Time2GoDbSettings", Time2GoDbSettings::qmlInstance);
     qmlRegisterType<Time2GoProject>(uri, 1, 0, "Time2GoProject");
-//    qmlRegisterType<Time2GoWorkUnit>(uri, 1, 0, "Time2GoWorkUnit");
+    qmlRegisterType<Time2GoWorkUnit>(uri, 1, 0, "Time2GoWorkUnit");
 //    qmlRegisterType<Time2GoWorkUnitsListModel>(uri, 1, 0, "Time2GoWorkUnitsListModel");
 //    qmlRegisterType<Time2GoBreaksListModel>(uri, 1, 0, "Time2GoBreaksListModel");
 //    qmlRegisterType<Time2GoWorkingTimeDay>(uri, 1, 0, "Time2GoWorkingTimeDay");

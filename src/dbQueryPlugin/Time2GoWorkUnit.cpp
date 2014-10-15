@@ -20,72 +20,114 @@
 ***************************************************************************/
 
 #include <QDebug>
-#include "Time2GoProject.h"
+#include "Time2GoWorkUnit.h"
 #include "QueryExecutor.h"
 
-Time2GoProject::Time2GoProject(QObject *parent) :
+Time2GoWorkUnit::Time2GoWorkUnit(QObject *parent) :
     QObject(parent),
     m_dbQueryExecutor(NULL),
     m_salt(rand()),
     m_uid(0),
-    m_name("")
+    m_project_uid(0),
+    m_start(),
+    m_end(),
+    m_notes("")
 {
     m_dbQueryExecutor = QueryExecutor::GetInstance();
     connect(m_dbQueryExecutor, SIGNAL(actionDone(QVariant)), this, SLOT(dbQueryResults(QVariant)));
 }
 
-Time2GoProject::~Time2GoProject()
+Time2GoWorkUnit::~Time2GoWorkUnit()
 {
     if (m_dbQueryExecutor) {
         delete m_dbQueryExecutor;
     }
 }
 
-// With setUid all project details will be loaded from database
-void Time2GoProject::setUid(const int value)
+// With setUid all workunit details will be loaded from database
+void Time2GoWorkUnit::setUid(const int value)
 {
     m_uid = value;
     // Load project details from database
     QVariantMap query;
     query["salt"] = m_salt;
-    query["type"] = QueryType::LoadProject;
+    query["type"] = QueryType::LoadWorkUnit;
     query["uid"] = value;
     m_dbQueryExecutor->queueAction(query);
 }
 
-void Time2GoProject::setName(const QString &value)
+void Time2GoWorkUnit::setProjectUid(const int value)
 {
-    m_name = value;
-    // store project details to database
+    m_project_uid = value;
+}
+
+void Time2GoWorkUnit::setStart(const QDateTime value)
+{
+    m_start = value;
+}
+
+void Time2GoWorkUnit::setEnd(const QDateTime value)
+{
+    m_end = value;
+}
+
+void Time2GoWorkUnit::setNotes(const QString& value)
+{
+    m_notes = value;
+}
+
+void Time2GoWorkUnit::save()
+{
+    saveWorkUnit();
+}
+
+// With setWorkUnit all workunit details will be saved to database
+void Time2GoWorkUnit::saveWorkUnit()
+{
+    // store workunit details to database
     QVariantMap query;
     query["salt"] = m_salt;
-    query["type"] = QueryType::SaveProject;
+    query["type"] = QueryType::SaveWorkUnit;
     query["uid"] = m_uid;
-    query["name"] = m_name;
+    query["projectuid"] = m_project_uid;
+    query["start"] = m_start;
+    query["end"] = m_end;
+    query["notes"] = m_notes;
     m_dbQueryExecutor->queueAction(query);
 }
 
-void Time2GoProject::dbQueryResults(QVariant query)
+void Time2GoWorkUnit::dbQueryResults(QVariant query)
 {
     QVariantMap reply = query.toMap();
     // Check if reply details are for us
     if (m_salt == reply["salt"].toInt()) {
         switch (reply["type"].toInt()) {
-        case QueryType::LoadProject: {
+        case QueryType::LoadWorkUnit: {
             qDebug() << "GetProject: " << reply;
             if (reply["done"].toBool()) {
                 m_uid = reply["uid"].toInt();
-                m_name = reply["name"].toString();
+                m_project_uid = reply["projectuid"].toInt();
+                m_start = reply["start"].toDateTime();
+                m_end = reply["end"].toDateTime();
+                m_notes = reply["notes"].toString();
                 Q_EMIT uidChanged();
-                Q_EMIT nameChanged();
+                Q_EMIT projectUidChanged();
+                Q_EMIT startChanged();
+                Q_EMIT endChanged();
+                Q_EMIT notesChanged();
             } else {
                 Q_EMIT dbQueryError(reply["error"].toString());
             }
             break;
         }
-        case QueryType::SaveProject: {
-            if (!reply["done"].toBool()) {
-                Q_EMIT dbQueryError(reply["error"].toString());
+        case QueryType::SaveWorkUnit: {
+            if (reply["done"].toBool()) {
+                // Save uid of object stored in database, so that next time saving we can rever to it
+                m_uid = reply["uid"].toInt();
+                Q_EMIT saved(0, "");
+            } else {
+//                Q_EMIT dbQueryError(reply["error"].toString());
+                Q_EMIT saved(1, reply["error"].toString());
             }
             break;
         }

@@ -7,65 +7,73 @@ Item {
 
     property bool showSec: false
 
-    signal beginDateChanged(int year, int month, int day)
-    signal beginTimeChanged(int hour, int minute)
-    signal endDateChanged(int year, int month, int day)
-    signal endTimeChanged(int hour, int minute)
+    signal startChanged(date dateTime)
+    signal endChanged(date dateTime)
 
-    function setBeginDate(year, month, day) {
-        beginYear = year
-        beginMonth = month
-        beginDay = day
-        beginDate.text = (day < 10 ? "0" : "") + day.toString() + "/" +
-                (month < 10 ? "0" : "") + month.toString()
+    function setStartDateTime(value) {
+        startYear = value.getFullYear()
+        startMonth = value.getMonth() + 1
+        startDay = value.getDate()
+        startHour = value.getHours()
+        startMin = value.getMinutes()
+        startSec = value.getSeconds()
+        updateStartDate()
+        updateStartTime()
     }
 
-    function setBeginTime(hour, min, sec) {
-        beginHour = hour
-        beginMin = min
-        beginSec = sec
-        beginTime.text = (hour < 10 ? "0" : "") + hour.toString() + ":" +
-                (min < 10 ? "0" : "") + min.toString() +
-                (showSec ? ":" + (sec < 10 ? "0" : "") + sec.toString() : "")
+    function setEndDateTime(value) {
+        endYear = value.getFullYear()
+        endMonth = value.getMonth() + 1
+        endDay = value.getDate()
+        endHour = value.getHours()
+        endMin = value.getMinutes()
+        endSec = value.getSeconds()
+        updateEndDate()
+        updateEndTime()
     }
 
-    function setEndDate(year, month, day) {
-        endYear = year
-        endMonth = month
-        endDay = day
-        endDate.text = (day < 10 ? "0" : "") + day.toString() + "/" +
-                (month < 10 ? "0" : "") + month.toString()
+    function updateStartDate() {
+        startDate.text = (startDay < 10 ? "0" : "") + startDay.toString() + "/" +
+                (startMonth < 10 ? "0" : "") + startMonth.toString()
     }
 
-    function setEndTime(hour, min, sec) {
-        endHour = hour
-        endMin = min
-        endSec = sec
-        endTime.text = (hour < 10 ? "0" : "") + hour.toString() + ":" +
-                (min < 10 ? "0" : "") + min.toString() +
-                (showSec ? ":" + (sec < 10 ? "0" : "") + sec.toString() : "")
+    function updateStartTime() {
+        startTime.text = (startHour < 10 ? "0" : "") + startHour.toString() + ":" +
+                (startMin < 10 ? "0" : "") + startMin.toString() +
+                (showSec ? ":" + (startSec < 10 ? "0" : "") + startSec.toString() : "")
+    }
+
+    function updateEndDate() {
+        endDate.text = (endDay < 10 ? "0" : "") + endDay.toString() + "/" +
+                (endMonth < 10 ? "0" : "") + endMonth.toString()
+    }
+
+    function updateEndTime() {
+        endTime.text = (endHour < 10 ? "0" : "") + endHour.toString() + ":" +
+                (endMin < 10 ? "0" : "") + endMin.toString() +
+                (showSec ? ":" + (endSec < 10 ? "0" : "") + endSec.toString() : "")
     }
 
     // internal
-    property int beginDay: 0
-    property int beginMonth: 0
-    property int beginYear: 0
-    property int beginHour: 0
-    property int beginMin: 0
-    property int beginSec: 0
-    property int endDay: 0
-    property int endMonth: 0
+    property int startYear: 0
+    property int startMonth: 0
+    property int startDay: 0
+    property int startHour: 0
+    property int startMin: 0
+    property int startSec: 0
     property int endYear: 0
+    property int endMonth: 0
+    property int endDay: 0
     property int endHour: 0
     property int endMin: 0
     property int endSec: 0
 
     x: Theme.paddingLarge
     width: parent.width - Theme.paddingLarge * 2
-    height: beginDate.height
+    height: startDate.height
 
     Label {
-        id: beginDate
+        id: startDate
         anchors.left: parent.left
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: Theme.fontSizeMedium
@@ -75,13 +83,16 @@ Item {
             anchors.fill: parent
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
-                                                date: new Date(dateTimeLine.beginYear + "/" +
-                                                               dateTimeLine.beginMonth + "/" +
-                                                               dateTimeLine.beginDay)
+                                                date: (startDay === 0 || startMonth === 0 || startYear === 0) ?
+                                                          new Date()
+                                                        : new Date(startYear + "/" + startMonth + "/" + startDay)
                                             })
                 dialog.accepted.connect(function() {
-                    dateTimeLine.setBeginDate(dialog.year, dialog.month, dialog.day)
-                    beginDateChanged(dialog.year, dialog.month, dialog.day)
+                    startYear = dialog.year
+                    startMonth = dialog.month
+                    startDay = dialog.day
+                    updateStartDate()
+                    startChanged(new Date(startYear, startMonth, startDay, startHour, startMin, startSec, 0))
                 })
             }
         }
@@ -89,7 +100,7 @@ Item {
 
     IconButton {
         id: dateIcon
-        anchors.left: beginDate.right
+        anchors.left: startDate.right
         anchors.verticalCenter: parent.verticalCenter
         icon.source: "image://theme/icon-s-date"
         highlighted: true
@@ -106,20 +117,23 @@ Item {
             anchors.fill: parent
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
-                                                date: new Date(dateTimeLine.endYear + "/" +
-                                                               dateTimeLine.endMonth + "/" +
-                                                               dateTimeLine.endDay)
+                                                date: (endDay === 0 || endMonth === 0 || endYear === 0) ?
+                                                          new Date()
+                                                        : new Date(endYear + "/" + endMonth + "/" + endDay)
                                             })
                 dialog.accepted.connect(function() {
-                    dateTimeLine.setEndDate(dialog.year, dialog.month, dialog.day)
-                    endDateChanged(dialog.year, dialog.month, dialog.day)
+                    endYear = dialog.year
+                    endMonth = dialog.month
+                    endDay = dialog.day
+                    updateEndDate()
+                    endChanged(new Date(endYear, endMonth, endDay, endHour, endMin, endSec, 0))
                 })
             }
         }
     }
 
     Label {
-        id: beginTime
+        id: startTime
         anchors.right: timeIcon.left
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: Theme.fontSizeMedium
@@ -129,13 +143,23 @@ Item {
             anchors.fill: parent
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
-                                                hour: dateTimeLine.beginHour,
-                                                minute: dateTimeLine.beginMin,
+                                                hour: startHour,
+                                                minute: startMin,
                                                 hourMode: DateTime.TwentyfourHours
                                             })
                 dialog.accepted.connect(function() {
-                    dateTimeLine.setBeginTime(dialog.hour, dialog.minute, dateTimeLine.beginSec)
-                    beginTimeChanged(dialog.hour, dialog.minute)
+                    startHour = dialog.hour
+                    startMin = dialog.minute
+                    // Check if date was already set. If not set it to current date
+                    if (startDay === 0 || startMonth === 0 || startYear === 0) {
+                        var now = new Date()
+                        startYear = now.getFullYear()
+                        startMonth = now.getMonth() + 1
+                        startDay = now.getDate()
+                        updateStartDate()
+                    }
+                    updateStartTime()
+                    startChanged(new Date(startYear, startMonth, startDay, startHour, startMin, startSec, 0))
                 })
             }
         }
@@ -163,13 +187,23 @@ Item {
             anchors.fill: parent
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
-                                                hour: dateTimeLine.endHour,
-                                                minute: dateTimeLine.endMin,
+                                                hour: endHour,
+                                                minute: endMin,
                                                 hourMode: DateTime.TwentyfourHours
                                             })
                 dialog.accepted.connect(function() {
-                    dateTimeLine.setEndTime(dialog.hour, dialog.minute, dateTimeLine.beginSec)
-                    endTimeChanged(dialog.hour, dialog.minute)
+                    endHour = dialog.hour
+                    endMin = dialog.minute
+                    // Check if date was already set. If not set it to current date
+                    if (endDay === 0 || endMonth === 0 || endYear === 0) {
+                        var now = new Date()
+                        endYear = now.getFullYear()
+                        endMonth = now.getMonth() + 1
+                        endDay = now.getDate()
+                        updateEndDate()
+                    }
+                    updateEndTime()
+                    endChanged(new Date(endYear, endMonth, endDay, endHour, endMin, endSec, 0))
                 })
             }
         }
