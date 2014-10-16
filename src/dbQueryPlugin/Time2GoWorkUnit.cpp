@@ -44,11 +44,11 @@ Time2GoWorkUnit::~Time2GoWorkUnit()
     }
 }
 
-// With setUid all workunit details will be loaded from database
+// With setUid all work unit details will be loaded from database
 void Time2GoWorkUnit::setUid(const int value)
 {
     m_uid = value;
-    // Load project details from database
+    // Load work unit details from database
     QVariantMap query;
     query["salt"] = m_salt;
     query["type"] = QueryType::LoadWorkUnit;
@@ -81,10 +81,10 @@ void Time2GoWorkUnit::save()
     saveWorkUnit();
 }
 
-// With setWorkUnit all workunit details will be saved to database
+// With setWorkUnit all work unit details will be saved to database
 void Time2GoWorkUnit::saveWorkUnit()
 {
-    // store workunit details to database
+    // store work unit details to database
     QVariantMap query;
     query["salt"] = m_salt;
     query["type"] = QueryType::SaveWorkUnit;
@@ -102,6 +102,10 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
     // Check if reply details are for us
     if (m_salt == reply["salt"].toInt()) {
         switch (reply["type"].toInt()) {
+        case QueryType::LoadLatestWorkUnit:
+            if (!reply["end"].toDateTime().isValid()) {
+                Q_EMIT unfinishedWorkUnit();
+            }
         case QueryType::LoadWorkUnit: {
             qDebug() << "GetProject: " << reply;
             if (reply["done"].toBool()) {
@@ -126,7 +130,6 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
                 m_uid = reply["uid"].toInt();
                 Q_EMIT saved(0, "");
             } else {
-//                Q_EMIT dbQueryError(reply["error"].toString());
                 Q_EMIT saved(1, reply["error"].toString());
             }
             break;
@@ -142,4 +145,13 @@ void Time2GoWorkUnit::reset()
     m_start = QDateTime();
     m_end = QDateTime();
     m_notes = "";
+}
+
+void Time2GoWorkUnit::loadLatestWorkUnit()
+{
+    // Load latest work unit details from database
+    QVariantMap query;
+    query["salt"] = m_salt;
+    query["type"] = QueryType::LoadLatestWorkUnit;
+    m_dbQueryExecutor->queueAction(query);
 }

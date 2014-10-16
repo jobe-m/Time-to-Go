@@ -19,52 +19,34 @@
 **
 ***************************************************************************/
 
-#ifndef TIME2GOWORKUNIT_H
-#define TIME2GOWORKUNIT_H
+#ifndef TIME2GOTIMECOUNTER_H
+#define TIME2GOTIMECOUNTER_H
 
 #include <QObject>
 #include "QueryExecutor.h"
 
-class Time2GoWorkUnit : public QObject
+class Time2GoTimeCounter : public QObject
 {
     Q_OBJECT
 public:
-    Q_PROPERTY(int uid READ uid WRITE setUid NOTIFY uidChanged)
     Q_PROPERTY(int projectUid READ projectUid WRITE setProjectUid NOTIFY projectUidChanged)
-    Q_PROPERTY(QDateTime start READ start WRITE setStart NOTIFY startChanged)
-    Q_PROPERTY(QDateTime end READ end WRITE setEnd NOTIFY endChanged)
-    Q_PROPERTY(QString notes READ notes WRITE setNotes NOTIFY notesChanged)
-    Q_PROPERTY(bool validStartDateTime READ validStartDateTime)
-    Q_PROPERTY(bool validEndDateTime READ validEndDateTime)
+    Q_PROPERTY(QTime workTime READ workTime NOTIFY workTimeChanged)
+    Q_PROPERTY(QTime breakTime READ breakTime NOTIFY breakTimeChanged)
 
-    Q_INVOKABLE void save();
-    Q_INVOKABLE void reset();
-    Q_INVOKABLE void loadLatestWorkUnit();
+    explicit Time2GoTimeCounter(QObject *parent = 0);
+    virtual ~Time2GoTimeCounter();
 
-    explicit Time2GoWorkUnit(QObject *parent = 0);
-    virtual ~Time2GoWorkUnit();
-
-    int uid() { return m_uid; }
-    void setUid(const int value);
     int projectUid() { return m_project_uid; }
     void setProjectUid(const int value);
-    QDateTime start() { return m_start; }
-    void setStart(const QDateTime value);
-    QDateTime end() { return m_end; }
-    void setEnd(const QDateTime value);
-    QString notes() { return m_notes; }
-    void setNotes(const QString& value);
-    bool validStartDateTime() { return m_start.isValid(); }
-    bool validEndDateTime() { return m_end.isValid(); }
+    QTime workTime() { return m_work_time; }
+    QTime breakTime() { return m_break_time; }
+
 signals:
     void uidChanged();
     void projectUidChanged();
-    void startChanged();
-    void endChanged();
-    void notesChanged();
+    void workTimeChanged();
+    void breakTimeChanged();
     void dbQueryError(const QString errorText);
-    void saved(int result, const QString errorText);
-    void unfinishedWorkUnit();
 
 public slots:
 
@@ -73,18 +55,13 @@ private slots:
     void dbQueryResults(QVariant query);
 
 private:
-    void saveWorkUnit();
-
-private:
     QueryExecutor* m_dbQueryExecutor;
     int m_salt;
 
-    // details of work unit
-    int m_uid;
+    // details of time counter
     int m_project_uid;
-    QDateTime m_start;
-    QDateTime m_end;
-    QString m_notes;
+    QTime m_work_time;
+    QTime m_break_time;
 };
 
-#endif // TIME2GOWORKUNIT_H
+#endif // TIME2GOTIMECOUNTER_H

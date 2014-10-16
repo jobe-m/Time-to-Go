@@ -33,13 +33,13 @@ QueryExecutor::QueryExecutor(QObject *parent) :
     }
 
     if (m_db.isOpen()) {
-
+/*
         // DEBUG: delete outdated database tables
         m_db.exec("DROP TABLE IF EXISTS settings");
         m_db.exec("DROP TABLE IF EXISTS projects");
         m_db.exec("DROP TABLE IF EXISTS workunits");
         m_db.exec("DROP TABLE IF EXISTS breaks");
-
+*/
         if (!m_db.tables().contains("settings")) {
             m_db.exec("CREATE TABLE settings (uid INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
                     "setting INTEGER);");
@@ -80,6 +80,7 @@ void QueryExecutor::processQuery(const QVariant &msg)
         case QueryType::LoadWorkUnit: { loadWorkUnit(query); break; }
         case QueryType::SaveWorkUnit: { saveWorkUnit(query); break; }
         case QueryType::LoadLatestWorkUnit: { loadLatestWorkUnit(query); break; }
+        case QueryType::LoadTimeCounter: { loadTimeCounter(query); break; }
         default: { break; }
         }
     }
@@ -220,4 +221,9 @@ QueryExecutor* QueryExecutor::GetInstance()
         singleton = new QueryExecutor(0);
     }
     return singleton;
+}
+
+void QueryExecutor::loadTimeCounter(QVariantMap query)
+{
+    QSqlQuery sql("SELECT start FROM workunits ORDER BY datetime(start) DESC LIMIT 1;", m_db);
 }

@@ -11,7 +11,7 @@ Page {
 
     property alias activeProjectUid: time2GoActiveProject.uid
 
-    function checkIn(value) {
+    function checkIn() {
         state = "CHECKED_IN"
         var now = new Date()
         workDateTimeLine.reset()
@@ -22,7 +22,7 @@ Page {
         time2GoWorkUnit.save()
     }
 
-    function checkOut(value) {
+    function checkOut() {
         state = "CHECKED_OUT"
         var now = new Date()
         workDateTimeLine.setEndDateTime(now)
@@ -111,6 +111,10 @@ Page {
                 workDateTimeLine.setEndDateTime(end)
             }
         }
+        onUnfinishedWorkUnit: {
+            // on application start set check in if there is a workunit with no end date time
+            state = "CHECKED_IN"
+        }
     }
 
 //    Time2GoBreaksListModel {
@@ -118,8 +122,10 @@ Page {
 //        activeWorkUnit: time2GoWorkUnit.uid
 //    }
 
-//    Time2GoWorkingTimeDay {
-//    }
+    Time2GoTimeCounter {
+        id: time2GoTimeCounterDay
+        projectUid: time2GoActiveProject.uid
+    }
 
 //    Time2GoWorkingTimeWeek {
 //    }
@@ -327,6 +333,8 @@ Page {
     }
 
     Component.onCompleted: {
+        // Load latest work unit from database
+        time2GoWorkUnit.loadLatestWorkUnit()
     }
 
     state: "CHECKED_OUT"

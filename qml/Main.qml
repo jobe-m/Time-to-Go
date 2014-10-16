@@ -37,19 +37,14 @@ ApplicationWindow
 
     // application global properties and functions
     function checkIn() {
-        var workingStart = new Date()
-        // save to database
-//        Time2GoDatabase.saveWorkUnit({id: 0, project: 1, start: workingStart, end: 0, notes: ""})
-        Global.setWorkingStart(workingStart)
         coverPage.checkIn()
-        mainPage.checkIn(Global.getWorkBeginTime())
+        mainPage.checkIn()
         uiUpdateTimer.restart()
     }
 
     function checkOut() {
-        Global.setWorkingEnd()
         coverPage.checkOut()
-        mainPage.checkOut(Global.getWorkEndTime())
+        mainPage.checkOut()
         uiUpdateTimer.stop()
     }
 
@@ -136,8 +131,5 @@ ApplicationWindow
         coverPage.setWorkingTime(Global.getWorkingTime())
         coverPage.setBreakTime(Global.getBreakTime())
 //        mainPage.setActiveProject(Global.getActiveProject())
-
-        // Load latest work unit
-//        Time2GoDatabase.loadLatestWorkUnit();
     }
 }

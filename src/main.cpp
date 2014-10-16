@@ -23,6 +23,7 @@
 #include <sailfishapp.h>
 #include "Time2GoProject.h"
 #include "Time2GoWorkUnit.h"
+#include "Time2GoTimeCounter.h"
 
 int main(int argc, char *argv[])
 {
@@ -42,11 +43,9 @@ int main(int argc, char *argv[])
 //    qmlRegisterSingletonType<Time2GoDbSettings>(uri, 1, 0, "Time2GoDbSettings", Time2GoDbSettings::qmlInstance);
     qmlRegisterType<Time2GoProject>(uri, 1, 0, "Time2GoProject");
     qmlRegisterType<Time2GoWorkUnit>(uri, 1, 0, "Time2GoWorkUnit");
+    qmlRegisterType<Time2GoTimeCounter>(uri, 1, 0, "Time2GoTimeCounter");
 //    qmlRegisterType<Time2GoWorkUnitsListModel>(uri, 1, 0, "Time2GoWorkUnitsListModel");
 //    qmlRegisterType<Time2GoBreaksListModel>(uri, 1, 0, "Time2GoBreaksListModel");
-//    qmlRegisterType<Time2GoWorkingTimeDay>(uri, 1, 0, "Time2GoWorkingTimeDay");
-//    qmlRegisterType<Time2GoWorkingTimeWeek>(uri, 1, 0, "Time2GoWorkingTimeWeek");
-//    qmlRegisterType<Time2GoWorkingTimeMonth>(uri, 1, 0, "Time2GoWorkingTimeMonth");
 
     // Setup some class as context properties and make them accessible in QML
 //    QScopedPointer<Time2GoHelper> helper(new Time2GoHelper());
