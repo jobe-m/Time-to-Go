@@ -102,7 +102,7 @@ Item {
             anchors.fill: parent
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
-                                                date: (startDay === 0 || startMonth === 0 || startYear === 0) ?
+                                                date: (startYear === 0) ?
                                                           new Date()
                                                         : new Date(startYear + "/" + startMonth + "/" + startDay)
                                             })
@@ -111,7 +111,7 @@ Item {
                     startMonth = dialog.month
                     startDay = dialog.day
                     updateStartDate()
-                    startChanged(new Date(startYear, startMonth, startDay, startHour, startMin, startSec, 0))
+                    startChanged(new Date(startYear, startMonth - 1, startDay, startHour, startMin, startSec, 0))
                 })
             }
         }
@@ -136,7 +136,7 @@ Item {
             anchors.fill: parent
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
-                                                date: (endDay === 0 || endMonth === 0 || endYear === 0) ?
+                                                date: (endYear === 0) ?
                                                           new Date()
                                                         : new Date(endYear + "/" + endMonth + "/" + endDay)
                                             })
@@ -145,7 +145,7 @@ Item {
                     endMonth = dialog.month
                     endDay = dialog.day
                     updateEndDate()
-                    endChanged(new Date(endYear, endMonth, endDay, endHour, endMin, endSec, 0))
+                    endChanged(new Date(endYear, endMonth - 1, endDay, endHour, endMin, endSec, 0))
                 })
             }
         }
@@ -170,7 +170,7 @@ Item {
                     startHour = dialog.hour
                     startMin = dialog.minute
                     // Check if date was already set. If not set it to current date
-                    if (startDay === 0 || startMonth === 0 || startYear === 0) {
+                    if (startYear === 0) {
                         var now = new Date()
                         startYear = now.getFullYear()
                         startMonth = now.getMonth() + 1
@@ -178,7 +178,7 @@ Item {
                         updateStartDate()
                     }
                     updateStartTime()
-                    startChanged(new Date(startYear, startMonth, startDay, startHour, startMin, startSec, 0))
+                    startChanged(new Date(startYear, startMonth - 1, startDay, startHour, startMin, startSec, 0))
                 })
             }
         }
@@ -214,7 +214,7 @@ Item {
                     endHour = dialog.hour
                     endMin = dialog.minute
                     // Check if date was already set. If not set it to current date
-                    if (endDay === 0 || endMonth === 0 || endYear === 0) {
+                    if (endYear === 0) {
                         var now = new Date()
                         endYear = now.getFullYear()
                         endMonth = now.getMonth() + 1
@@ -222,7 +222,7 @@ Item {
                         updateEndDate()
                     }
                     updateEndTime()
-                    endChanged(new Date(endYear, endMonth, endDay, endHour, endMin, endSec, 0))
+                    endChanged(new Date(endYear, endMonth - 1, endDay, endHour, endMin, endSec, 0))
                 })
             }
         }
