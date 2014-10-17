@@ -72,7 +72,7 @@ void Time2GoProject::dbQueryResults(QVariant query)
     if (m_salt == reply["salt"].toInt()) {
         switch (reply["type"].toInt()) {
         case QueryType::LoadProject: {
-            qDebug() << "GetProject: " << reply;
+//            qDebug() << "GetProject: " << reply;
             if (reply["done"].toBool()) {
                 m_uid = reply["uid"].toInt();
                 m_name = reply["name"].toString();

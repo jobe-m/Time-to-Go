@@ -29,17 +29,23 @@ class Time2GoTimeCounter : public QObject
 {
     Q_OBJECT
 public:
+    Q_ENUMS()
     Q_PROPERTY(int projectUid READ projectUid WRITE setProjectUid NOTIFY projectUidChanged)
-    Q_PROPERTY(QTime workTime READ workTime NOTIFY workTimeChanged)
-    Q_PROPERTY(QTime breakTime READ breakTime NOTIFY breakTimeChanged)
+    Q_PROPERTY(int workTime READ workTime NOTIFY workTimeChanged)
+    Q_PROPERTY(int breakTime READ breakTime NOTIFY breakTimeChanged)
+    Q_PROPERTY(int updateInterval READ updateInterval WRITE setUpdateInterval)
+
+    Q_INVOKABLE void reload();
 
     explicit Time2GoTimeCounter(QObject *parent = 0);
     virtual ~Time2GoTimeCounter();
 
     int projectUid() { return m_project_uid; }
     void setProjectUid(const int value);
-    QTime workTime() { return m_work_time; }
-    QTime breakTime() { return m_break_time; }
+    int workTime() { return m_work_time / 1000; }
+    int breakTime() { return m_break_time / 1000; }
+    int updateInterval() { return m_update_interval; }
+    void setUpdateInterval(const int value);
 
 signals:
     void uidChanged();
@@ -53,15 +59,21 @@ public slots:
 private slots:
     // from query executor
     void dbQueryResults(QVariant query);
+    // from QTimer
+    void update();
 
 private:
     QueryExecutor* m_dbQueryExecutor;
+    QTimer* m_updateTimer;
+    QTime m_timer;
     int m_salt;
 
     // details of time counter
     int m_project_uid;
-    QTime m_work_time;
-    QTime m_break_time;
+    int m_work_time; // stored in milliseconds
+    int m_break_time; // stored in milliseconds
+    bool m_time_running;
+    int m_update_interval; // stored in milliseconds
 };
 
 #endif // TIME2GOTIMECOUNTER_H

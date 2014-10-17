@@ -107,18 +107,13 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
                 Q_EMIT unfinishedWorkUnit();
             }
         case QueryType::LoadWorkUnit: {
-            qDebug() << "GetProject: " << reply;
             if (reply["done"].toBool()) {
                 m_uid = reply["uid"].toInt();
                 m_project_uid = reply["projectuid"].toInt();
                 m_start = reply["start"].toDateTime();
                 m_end = reply["end"].toDateTime();
                 m_notes = reply["notes"].toString();
-                Q_EMIT uidChanged();
-                Q_EMIT projectUidChanged();
-                Q_EMIT startChanged();
-                Q_EMIT endChanged();
-                Q_EMIT notesChanged();
+                Q_EMIT timeChanged();
             } else {
                 Q_EMIT dbQueryError(reply["error"].toString());
             }
@@ -128,6 +123,7 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
             if (reply["done"].toBool()) {
                 // Save uid of object stored in database, so that next time saving we can rever to it
                 m_uid = reply["uid"].toInt();
+                Q_EMIT timeChanged();
                 Q_EMIT saved(0, "");
             } else {
                 Q_EMIT saved(1, reply["error"].toString());

@@ -26,13 +26,19 @@
 Time2GoTimeCounter::Time2GoTimeCounter(QObject *parent) :
     QObject(parent),
     m_dbQueryExecutor(NULL),
+    m_updateTimer(NULL),
+    m_timer(),
     m_salt(rand()),
     m_project_uid(0),
     m_work_time(),
-    m_break_time()
+    m_break_time(),
+    m_time_running(false),
+    m_update_interval(1000)
 {
     m_dbQueryExecutor = QueryExecutor::GetInstance();
     connect(m_dbQueryExecutor, SIGNAL(actionDone(QVariant)), this, SLOT(dbQueryResults(QVariant)));
+    m_updateTimer = new QTimer(this);
+    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(update()));
 }
 
 Time2GoTimeCounter::~Time2GoTimeCounter()
@@ -40,19 +46,16 @@ Time2GoTimeCounter::~Time2GoTimeCounter()
     if (m_dbQueryExecutor) {
         delete m_dbQueryExecutor;
     }
+    if (m_updateTimer) {
+        delete m_updateTimer;
+    }
 }
 
 // With setUid all work unit details will be loaded from database
 void Time2GoTimeCounter::setProjectUid(const int value)
 {
     m_project_uid = value;
-    // Load work unit details from database
-    QVariantMap query;
-    query["salt"] = m_salt;
-    query["counter"] = QueryType::Day;
-    query["type"] = QueryType::LoadTimeCounter;
-    query["projectuid"] = value;
-    m_dbQueryExecutor->queueAction(query);
+    reload();
 }
 
 void Time2GoTimeCounter::dbQueryResults(QVariant query)
@@ -62,25 +65,51 @@ void Time2GoTimeCounter::dbQueryResults(QVariant query)
     if (m_salt == reply["salt"].toInt()) {
         switch (reply["type"].toInt()) {
         case QueryType::LoadTimeCounter: {
-            qDebug() << "GetProject: " << reply;
-            if (reply["done"].toBool()) {
-                if (m_project_uid != reply["projectuid"].toInt()) {
-                    m_project_uid = reply["projectuid"].toInt();
-                    Q_EMIT projectUidChanged();
-                }
-                if (m_work_time != reply["worktime"].toTime()) {
-                    m_work_time = reply["worktime"].toTime();
-                    Q_EMIT workTimeChanged();
-                }
-                if (m_break_time != reply["breaktime"].toTime()) {
-                    m_break_time = reply["breaktime"].toTime();
-                    Q_EMIT breakTimeChanged();
-                }
+            qDebug() << "LoadTimeCounter: " << reply;
+            if (m_project_uid != reply["projectuid"].toInt()) {
+                m_project_uid = reply["projectuid"].toInt();
+                Q_EMIT projectUidChanged();
+            }
+            if (m_work_time != reply["worktime"].toInt()) {
+                m_work_time = reply["worktime"].toInt();
+                Q_EMIT workTimeChanged();
+            }
+            if (m_break_time != reply["breaktime"].toInt()) {
+                m_break_time = reply["breaktime"].toInt();
+                Q_EMIT breakTimeChanged();
+            }
+            m_time_running = reply["running"].toBool();
+            if (m_time_running) {
+                m_updateTimer->start(m_update_interval);
+                m_timer.start();
             } else {
-                Q_EMIT dbQueryError(reply["error"].toString());
+                m_updateTimer->stop();
             }
             break;
         }
         }
     }
+}
+
+void Time2GoTimeCounter::update()
+{
+    m_work_time += m_timer.restart();
+    Q_EMIT workTimeChanged();
+}
+
+void Time2GoTimeCounter::setUpdateInterval(const int value)
+{
+    m_update_interval = value;
+    m_updateTimer->setInterval(value);
+}
+
+void Time2GoTimeCounter::reload()
+{
+    // Load work unit details from database
+    QVariantMap query;
+    query["salt"] = m_salt;
+    query["counter"] = QueryType::Day;
+    query["type"] = QueryType::LoadTimeCounter;
+    query["projectuid"] = m_project_uid;
+    m_dbQueryExecutor->queueAction(query);
 }

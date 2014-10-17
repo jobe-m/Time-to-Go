@@ -28,6 +28,7 @@ Page {
         workDateTimeLine.setEndDateTime(now)
         time2GoWorkUnit.end = now
         time2GoWorkUnit.save()
+        time2GoTimeCounterDay.reload()
     }
 
     function startBreak() {
@@ -41,13 +42,6 @@ Page {
     // This function set working time in seconds
     function setWorkingTime(value) {
         if (state === "CHECKED_IN") {
-            __workingTime = value
-            var sec = value
-            var min = (sec/60).toFixedDown(0)
-            var hour = (min/60).toFixedDown(0)
-            workingTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
-                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
         }
     }
 
@@ -101,18 +95,18 @@ Page {
         id: time2GoWorkUnit
         projectUid: time2GoActiveProject.uid
 
-        onStartChanged: {
+        onTimeChanged: {
             if (validStartDateTime) {
                 workDateTimeLine.setStartDateTime(start)
             }
-        }
-        onEndChanged: {
             if (validEndDateTime) {
                 workDateTimeLine.setEndDateTime(end)
             }
+            time2GoTimeCounterDay.reload()
         }
         onUnfinishedWorkUnit: {
             // on application start set check in if there is a workunit with no end date time
+            console.log("Unfinished work unit, set to CHECKED_IN")
             state = "CHECKED_IN"
         }
     }
@@ -125,6 +119,19 @@ Page {
     Time2GoTimeCounter {
         id: time2GoTimeCounterDay
         projectUid: time2GoActiveProject.uid
+
+        onWorkTimeChanged: {
+            __workingTime = workTime
+            var sec = workTime
+            var min = (sec/60).toFixedDown(0)
+            var hour = (min/60).toFixedDown(0)
+            workingTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
+                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+        }
+        onBreakTimeChanged: {
+
+        }
     }
 
 //    Time2GoWorkingTimeWeek {
@@ -313,10 +320,6 @@ Page {
                 onEndChanged: {
                     time2GoWorkUnit.end = dateTime
                     time2GoWorkUnit.save()
-                }
-
-                Component.onCompleted: {
-                    console.log("DateTimeLine start: " + time2GoWorkUnit.start.valueOf())
                 }
             }
 

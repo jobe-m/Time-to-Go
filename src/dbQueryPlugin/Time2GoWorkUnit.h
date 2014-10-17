@@ -65,6 +65,7 @@ signals:
     void dbQueryError(const QString errorText);
     void saved(int result, const QString errorText);
     void unfinishedWorkUnit();
+    void timeChanged();
 
 public slots:
 

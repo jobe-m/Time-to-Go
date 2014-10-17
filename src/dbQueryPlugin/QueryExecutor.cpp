@@ -11,7 +11,6 @@ QueryExecutor::QueryExecutor(QObject *parent) :
 
     m_db = QSqlDatabase::database();
     if (!m_db.isOpen()) {
-        qDebug() << "QE Opening database";
         m_db = QSqlDatabase::addDatabase("QSQLITE");
 
         QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
@@ -35,10 +34,10 @@ QueryExecutor::QueryExecutor(QObject *parent) :
     if (m_db.isOpen()) {
 /*
         // DEBUG: delete outdated database tables
-        m_db.exec("DROP TABLE IF EXISTS settings");
-        m_db.exec("DROP TABLE IF EXISTS projects");
-        m_db.exec("DROP TABLE IF EXISTS workunits");
-        m_db.exec("DROP TABLE IF EXISTS breaks");
+        m_db.exec("DROP TABLE IF EXISTS settings;");
+        m_db.exec("DROP TABLE IF EXISTS projects;");
+        m_db.exec("DROP TABLE IF EXISTS workunits;");
+        m_db.exec("DROP TABLE IF EXISTS breaks;");
 */
         if (!m_db.tables().contains("settings")) {
             m_db.exec("CREATE TABLE settings (uid INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
@@ -72,7 +71,7 @@ void QueryExecutor::processAction(QVariant message) {
 void QueryExecutor::processQuery(const QVariant &msg)
 {
     QVariantMap query = msg.toMap();
-    qDebug() << "QE Processing query:" << query;
+//    qDebug() << "QE Processing query:" << query;
     if (!query.isEmpty()) {
         switch (query["type"].toInt()) {
         case QueryType::LoadProject: { loadProject(query); break; }
@@ -197,15 +196,15 @@ void QueryExecutor::loadLatestWorkUnit(QVariantMap query)
     QSqlQuery sql("SELECT * FROM workunits ORDER BY datetime(start) DESC LIMIT 1;", m_db);
     if (sql.next()) {
         query["uid"] = sql.value(0);
-        qDebug() << sql.value(0);
+//        qDebug() << sql.value(0);
         query["projectuid"] = sql.value(1);
-        qDebug() << sql.value(1);
+//        qDebug() << sql.value(1);
         query["start"] = sql.value(2);
-        qDebug() << sql.value(2);
+//        qDebug() << sql.value(2);
         query["end"] = sql.value(3);
-        qDebug() << sql.value(3);
+//        qDebug() << sql.value(3);
         query["notes"] = sql.value(4);
-        qDebug() << sql.value(4);
+//        qDebug() << sql.value(4);
         query["done"] = true;
     } else {
         query["done"] = false;
@@ -225,5 +224,53 @@ QueryExecutor* QueryExecutor::GetInstance()
 
 void QueryExecutor::loadTimeCounter(QVariantMap query)
 {
-    QSqlQuery sql("SELECT start FROM workunits ORDER BY datetime(start) DESC LIMIT 1;", m_db);
+    int seconds = 0;
+    query["running"] = false;
+
+// TODO take projectUid into account
+    //query["projectuid"]
+    QSqlQuery sql("select start, end from workunits where start > date('now') or end > date('now','+2 hour');", m_db);
+    while (sql.next()) {
+        qDebug() << "work unit start: " << sql.value(0).toString() << " end: " << sql.value(1).toString();
+        QDateTime start = sql.value(0).toDateTime();
+        QTime startTime = start.time();
+        // Sanity check for validity and start date from future -> discard this work unit
+        if (!start.date().isValid() || start.date() > QDate::currentDate()) {
+            continue;
+        }
+        // Check start date if it is before today
+        // If yes -> set to midnight
+        if (start.date() < QDate::currentDate()) {
+            startTime = QTime(0, 0, 0, 0);
+        }
+        qDebug() << "start time: " << startTime.toString();
+
+        QDateTime end = sql.value(1).toDateTime();
+        QTime endTime = end.time();
+        // Check if end date is set otherwise the work unit is still running
+        if (!end.date().isValid()) {
+            query["running"] = true;
+            endTime = QTime::currentTime();
+        } else
+        // Sanity check for end date from any day before today -> discard this work unit
+        if (end.date() < QDate::currentDate()) {
+            continue;
+        } else
+        // Check if end date is after today
+        // If yes -> set to one second before next midnight
+        if (end.date() > QDate::currentDate()) {
+            endTime = QTime(23,59,59,999);
+        }
+        qDebug() << "end time: " << endTime.toString();
+
+        seconds += startTime.msecsTo(endTime);
+        qDebug() << "Milliseconds: " << seconds;
+    }
+    query["worktime"] = seconds;
+    // Send result back to QML world
+
+    // TODO: calculate break time
+    query["breaktime"] = 0;
+
+    Q_EMIT actionDone(query);
 }
