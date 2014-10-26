@@ -32,11 +32,13 @@ SOURCES += \
     src/dbQueryPlugin/ThreadWorker.cpp \
     src/dbQueryPlugin/Time2GoProject.cpp \
     src/dbQueryPlugin/Time2GoWorkUnit.cpp \
-    src/dbQueryPlugin/Time2GoTimeCounter.cpp
+    src/dbQueryPlugin/Time2GoTimeCounter.cpp \
+    src/dbQueryPlugin/Time2GoReportListModel.cpp
 
 HEADERS += \
     src/dbQueryPlugin/QueryExecutor.h \
     src/dbQueryPlugin/ThreadWorker.h \
     src/dbQueryPlugin/Time2GoProject.h \
     src/dbQueryPlugin/Time2GoWorkUnit.h \
-    src/dbQueryPlugin/Time2GoTimeCounter.h
+    src/dbQueryPlugin/Time2GoTimeCounter.h \
+    src/dbQueryPlugin/Time2GoReportListModel.h

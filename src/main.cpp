@@ -24,6 +24,7 @@
 #include "Time2GoProject.h"
 #include "Time2GoWorkUnit.h"
 #include "Time2GoTimeCounter.h"
+#include "Time2GoReportListModel.h"
 
 int main(int argc, char *argv[])
 {
@@ -44,6 +45,7 @@ int main(int argc, char *argv[])
     qmlRegisterType<Time2GoProject>(uri, 1, 0, "Time2GoProject");
     qmlRegisterType<Time2GoWorkUnit>(uri, 1, 0, "Time2GoWorkUnit");
     qmlRegisterType<Time2GoTimeCounter>(uri, 1, 0, "Time2GoTimeCounter");
+    qmlRegisterType<Time2GoReportListModel>(uri, 1, 0, "Time2GoReportListModel");
 //    qmlRegisterType<Time2GoWorkUnitsListModel>(uri, 1, 0, "Time2GoWorkUnitsListModel");
 //    qmlRegisterType<Time2GoBreaksListModel>(uri, 1, 0, "Time2GoBreaksListModel");
 

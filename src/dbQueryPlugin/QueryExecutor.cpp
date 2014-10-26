@@ -3,6 +3,7 @@
 #include <QStandardPaths>
 
 #include "QueryExecutor.h"
+#include "Time2GoReportListModel.h"
 
 QueryExecutor::QueryExecutor(QObject *parent) :
     QObject(parent)
@@ -80,6 +81,7 @@ void QueryExecutor::processQuery(const QVariant &msg)
         case QueryType::SaveWorkUnit: { saveWorkUnit(query); break; }
         case QueryType::LoadLatestWorkUnit: { loadLatestWorkUnit(query); break; }
         case QueryType::LoadTimeCounter: { loadTimeCounter(query); break; }
+        case QueryType::LoadReport: { loadReport(query); break; }
         default: { break; }
         }
     }
@@ -272,5 +274,37 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
     // TODO: calculate break time
     query["breaktime"] = 0;
 
+    Q_EMIT actionDone(query);
+}
+
+void QueryExecutor::loadReport(QVariantMap query)
+{
+    QSqlQuery sql("select * from workunits where start > date('now','start of month') or end > date('now','start of month');", m_db);
+    while (sql.next()) {
+        int worktime = 0;
+        QDateTime start = sql.value(2).toDateTime();
+        QTime startTime = start.time();
+        qDebug() << "start time: " << startTime.toString();
+
+        QDateTime end = sql.value(3).toDateTime();
+        QTime endTime = end.time();
+        qDebug() << "end time: " << endTime.toString();
+
+        worktime += startTime.msecsTo(endTime);
+        qDebug() << "Milliseconds: " << worktime;
+
+        ReportItem item(sql.value(0).toInt(),       // uid
+                        sql.value(1).toInt(),       // project uid
+                        startTime,                  // work start
+                        endTime,                    // work end
+                        0,                          // break time
+                        worktime);                  // work time
+        // append new entry to end of list
+        Time2GoReportListModel* listModel = (Time2GoReportListModel*) query["listmodel"].toInt();
+        Q_ASSERT(listModel);
+        if (listModel) {
+            listModel->addItemToListModel(item);
+        }
+    }
     Q_EMIT actionDone(query);
 }

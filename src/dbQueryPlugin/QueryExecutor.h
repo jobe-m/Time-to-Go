@@ -18,12 +18,19 @@ namespace QueryType {
         SaveBreak,
         LoadLatestWorkUnit,
         LoadTimeCounter,
+        LoadReport
     };
     enum EnumCounterType {
         Day,
         Week,
         Month,
         Individual
+    };
+    enum EnumReportType {
+        All,
+        CurrentYear,
+        CurrentMonth,
+        CurrentWeek
     };
 }
 
@@ -50,6 +57,7 @@ private:
     void saveWorkUnit(QVariantMap query);
     void loadLatestWorkUnit(QVariantMap query);
     void loadTimeCounter(QVariantMap query);
+    void loadReport(QVariantMap query);
 
 private:
     ThreadWorker m_worker;
