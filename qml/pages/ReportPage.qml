@@ -7,14 +7,10 @@ import harbour.Time2Go.DatabaseQuery 1.0
 Page {
     id: reportPage
 
-    Time2GoReportListModel {
-        id: reportModel
-    }
-
     SilicaListView {
         id: listView
         currentIndex: -1
-        model: reportModel
+        model: applicationWindow.reportModel
         anchors.fill: parent
         header: PageHeader {
             title: qsTr("Time2Go reports")
@@ -37,9 +33,8 @@ Page {
         VerticalScrollDecorator {}
     }
 
-    onStatusChanged: {
-        if (status === PageStatus.Active) {
-            reportModel.loadReport()
-        }
+    Component.onCompleted:  {
+        console.log("Load report")
+        applicationWindow.reportModel.loadReport()
     }
 }

@@ -101,6 +101,7 @@ private slots:
 private:
     QueryExecutor *m_dbQueryExecutor;
     int m_salt;
+    bool m_report_loaded;
 
     QList<ReportItem> m_items;
 };

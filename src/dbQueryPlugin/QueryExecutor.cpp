@@ -280,6 +280,10 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
 void QueryExecutor::loadReport(QVariantMap query)
 {
     QSqlQuery sql("select * from workunits where start > date('now','start of month') or end > date('now','start of month');", m_db);
+    if (!sql.isValid()) {
+        query["done"] = false;
+        Q_EMIT actionDone(query);
+    }
     while (sql.next()) {
         int worktime = 0;
         QDateTime start = sql.value(2).toDateTime();
@@ -293,18 +297,13 @@ void QueryExecutor::loadReport(QVariantMap query)
         worktime += startTime.msecsTo(endTime);
         qDebug() << "Milliseconds: " << worktime;
 
-        ReportItem item(sql.value(0).toInt(),       // uid
-                        sql.value(1).toInt(),       // project uid
-                        startTime,                  // work start
-                        endTime,                    // work end
-                        0,                          // break time
-                        worktime);                  // work time
-        // append new entry to end of list
-        Time2GoReportListModel* listModel = (Time2GoReportListModel*) query["listmodel"].toInt();
-        Q_ASSERT(listModel);
-        if (listModel) {
-            listModel->addItemToListModel(item);
-        }
+        query["done"] = true;
+        query["uid"] = sql.value(0).toInt();
+        query["projectuid"] = sql.value(1).toInt();
+        query["starttime"] = startTime;
+        query["endtime"] = endTime;
+        query["breaktime"] = 0;
+        query["worktime"] = worktime;
+        Q_EMIT actionDone(query);
     }
-    Q_EMIT actionDone(query);
 }

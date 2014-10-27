@@ -34,6 +34,7 @@ ApplicationWindow
 
     // For accessing main page to pass further application activity status
     property MainPage mainPage: null
+    property Time2GoReportListModel reportModel: null
 
     // application global properties and functions
     function checkIn() {
@@ -121,6 +122,11 @@ ApplicationWindow
             coverPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
             mainPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
         }
+    }
+
+    Time2GoReportListModel {
+        id: reportModelObj
+        Component.onCompleted: reportModel = reportModelObj
     }
 
     Component.onCompleted: {

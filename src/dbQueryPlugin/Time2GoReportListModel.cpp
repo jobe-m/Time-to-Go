@@ -23,7 +23,10 @@
 
 Time2GoReportListModel::Time2GoReportListModel(QObject *parent)
     : QAbstractListModel(parent),
-      m_dbQueryExecutor(NULL)
+      m_dbQueryExecutor(NULL),
+      m_salt(rand()),
+      m_report_loaded(false),
+      m_items()
 {
       m_dbQueryExecutor = QueryExecutor::GetInstance();
       connect(m_dbQueryExecutor, SIGNAL(actionDone(QVariant)), this, SLOT(slot_dbQueryResults(QVariant)));
@@ -64,11 +67,12 @@ void Time2GoReportListModel::clear()
 void Time2GoReportListModel::loadReport()
 {
     // load work unit details from database
-    QVariantMap query;
-    query["salt"] = m_salt;
-    query["type"] = QueryType::LoadReport;
-    query["listmodel"] = (int) this;
-    m_dbQueryExecutor->queueAction(query);
+    if (!m_report_loaded) {
+        QVariantMap query;
+        query["salt"] = m_salt;
+        query["type"] = QueryType::LoadReport;
+        m_dbQueryExecutor->queueAction(query);
+    }
 }
 
 void Time2GoReportListModel::slot_dbQueryResults(QVariant query)
@@ -79,9 +83,14 @@ void Time2GoReportListModel::slot_dbQueryResults(QVariant query)
         switch (reply["type"].toInt()) {
         case QueryType::LoadReport: {
             if (reply["done"].toBool()) {
-                // Save uid of object stored in database, so that next time saving we can rever to it
-            } else {
-//                Q_EMIT saved(1, reply["error"].toString());
+                m_report_loaded = true;
+                ReportItem item(reply["uid"].toInt(),
+                        reply["projectuid"].toInt(),
+                        reply["starttime"].toTime(),
+                reply["endtime"].toTime(),
+                reply["breaktime"].toInt(),
+                reply["worktime"].toInt());
+                addItemToListModel(item);
             }
             break;
         }
