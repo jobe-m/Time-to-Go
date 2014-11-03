@@ -12,8 +12,70 @@ Page {
         currentIndex: -1
         model: applicationWindow.reportModel
         anchors.fill: parent
-        header: PageHeader {
-            title: qsTr("Time2Go reports")
+        header: Column {
+            width: Screen.width
+            height: children.height
+            spacing: Theme.paddingSmall
+
+            PageHeader {
+                title: qsTr("Time sheet")
+            }
+
+            Item {
+                width: parent.width
+                height: headerLabel.height
+
+                Label {
+                    id: headerLabel
+                    x: Theme.paddingLarge
+                    text: qsTr("Start")
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.highlightColor
+                }
+
+                Label {
+                    x: Theme.paddingLarge * 5
+                    text: qsTr("End")
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.highlightColor
+                }
+
+                Label {
+                    x: Theme.paddingLarge * 13
+                    text: qsTr("Break")
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.highlightColor
+                }
+
+                Label {
+                    x: Theme.paddingLarge * 17
+                    text: qsTr("Work time")
+                    font.pixelSize: Theme.fontSizeExtraSmall
+                    color: Theme.highlightColor
+                }
+            }
+        }
+
+        section.property: "day"
+        section.criteria: ViewSection.FullString
+        section.delegate: Item {
+            width: Screen.width
+            height: sectionLabel.height
+
+            Label {
+                id: sectionLabel
+                x: Theme.paddingLarge
+                text: section
+                font.pixelSize: Theme.fontSizeExtraSmall
+                color: Theme.primaryColor
+            }
+
+            Rectangle {
+                x: 0
+                anchors.fill: parent
+                color: "white"
+                opacity: 0.1
+            }
         }
 
         delegate: BackgroundItem {
@@ -21,19 +83,45 @@ Page {
 
             Label {
                 x: Theme.paddingLarge
-                text: "start: " + model.workstart.getHours() + ":" + model.workstart.getMinutes() +
-                      " end: " + model.workend.getHours() + ":" + model.workend.getMinutes() +
-                      " work time: " + model.worktime
                 anchors.verticalCenter: parent.verticalCenter
+                text: model.workstart
+                font.pixelSize: Theme.fontSizeMedium
                 color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
             }
+
+            Label {
+                x: Theme.paddingLarge * 5
+                anchors.verticalCenter: parent.verticalCenter
+                text: model.workend
+                font.pixelSize: Theme.fontSizeMedium
+                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
+            }
+
+            Label {
+                x: Theme.paddingLarge * 13
+                anchors.verticalCenter: parent.verticalCenter
+                text: model.breaktime
+                font.pixelSize: Theme.fontSizeMedium
+                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
+            }
+
+            Label {
+                x: Theme.paddingLarge * 17
+                anchors.verticalCenter: parent.verticalCenter
+                text: model.worktime
+                font.pixelSize: Theme.fontSizeMedium
+                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
+            }
+
             onClicked: {}
         }
 
         VerticalScrollDecorator {}
     }
 
-    Component.onCompleted:  {
+    // The delegate for each section header
+
+    Component.onCompleted: {
         console.log("Load report")
         applicationWindow.reportModel.loadReport()
     }

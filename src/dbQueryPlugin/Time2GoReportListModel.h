@@ -32,9 +32,10 @@ static const int baseRole = Qt::UserRole + 1;
 class ReportItem
 {
 public:
-    ReportItem(int uid, int projectUid, QTime workStart, QTime workEnd, int breakTime, int workTime)
+    ReportItem(int uid, int projectUid, QString day, QString workStart, QString workEnd, QString breakTime, QString workTime)
         : m_uid(uid),
           m_project_uid(projectUid),
+          m_day(day),
           m_work_start(workStart),
           m_work_end(workEnd),
           m_break_time(breakTime),
@@ -47,10 +48,11 @@ public:
 
     int m_uid;
     int m_project_uid;
-    QTime m_work_start;
-    QTime m_work_end;
-    int m_break_time;
-    int m_work_time;
+    QString m_day;
+    QString m_work_start;
+    QString m_work_end;
+    QString m_break_time;
+    QString m_work_time;
 };
 
 class Time2GoReportListModel : public QAbstractListModel
@@ -101,7 +103,7 @@ private slots:
 private:
     QueryExecutor *m_dbQueryExecutor;
     int m_salt;
-    bool m_report_loaded;
+    bool m_report_requested;
 
     QList<ReportItem> m_items;
 };
@@ -115,12 +117,14 @@ inline QVariant ReportItem::get(const int role) const
     case baseRole + 1:
         return m_project_uid;
     case baseRole + 2:
-        return m_work_start;
+        return m_day;
     case baseRole + 3:
-        return m_work_end;
+        return m_work_start;
     case baseRole + 4:
-        return m_break_time;
+        return m_work_end;
     case baseRole + 5:
+        return m_break_time;
+    case baseRole + 6:
         return m_work_time;
     }
     return QVariant();
@@ -131,10 +135,11 @@ inline QHash<int, QByteArray> ReportItem::createRoles()
     QHash<int, QByteArray> roles;
     roles[baseRole]     = "uid";
     roles[baseRole + 1] = "projectuid";
-    roles[baseRole + 2] = "workstart";
-    roles[baseRole + 3] = "workend";
-    roles[baseRole + 4] = "breaktime";
-    roles[baseRole + 5] = "worktime";
+    roles[baseRole + 2] = "day";
+    roles[baseRole + 3] = "workstart";
+    roles[baseRole + 4] = "workend";
+    roles[baseRole + 5] = "breaktime";
+    roles[baseRole + 6] = "worktime";
     return roles;
 }
 

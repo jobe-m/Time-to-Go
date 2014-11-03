@@ -56,6 +56,7 @@ public:
     void setNotes(const QString& value);
     bool validStartDateTime() { return m_start.isValid(); }
     bool validEndDateTime() { return m_end.isValid(); }
+
 signals:
     void uidChanged();
     void projectUidChanged();

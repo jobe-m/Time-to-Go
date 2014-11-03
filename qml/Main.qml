@@ -68,24 +68,10 @@ ApplicationWindow
         } else {
             Global.activateProject(value);
         }
-//        coverPage.setActiveProject(Global.getActiveProject())
-//        mainPage.setActiveProject(Global.getActiveProject())
     }
 
     initialPage: mainPageContainer
     cover: coverPage
-
-//    Connections {
-//        target: Time2GoDatabase
-//        onWorkUnitSaved: {
-//            console.log("OnWorkUnitSaved: reply id: " + reply["id"] + " done: " + reply["done"] +" error: " + reply["error"])
-//        }
-//        onLatestWorkUnitLoaded: {
-//            console.log("onLatestWorkUnitLoaded: reply id: " + reply["id"] + " done: " +
-//                        reply["done"] +" start: " + reply["start"] + " end: " + reply["end"])
-//            Global.setWorkingStart(new Date(reply["start"]))
-//        }
-//    }
 
     // Place info popup outside of page stack so that it is shown over all
     // application UI elements

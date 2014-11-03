@@ -103,7 +103,7 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
     if (m_salt == reply["salt"].toInt()) {
         switch (reply["type"].toInt()) {
         case QueryType::LoadLatestWorkUnit:
-            if (!reply["end"].toDateTime().isValid()) {
+            if (reply["done"].toBool() && !reply["end"].toDateTime().isValid()) {
                 Q_EMIT unfinishedWorkUnit();
             }
         case QueryType::LoadWorkUnit: {

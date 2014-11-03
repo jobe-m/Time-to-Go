@@ -8,15 +8,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Start break</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Check out</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Stop break</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -24,23 +16,7 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Settings</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Time2Go</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Active project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Begin and end of work unit</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>Begin and end of break(s)</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -59,11 +35,31 @@
         <source>Month</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Begin and end of latest work unit</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ReportPage</name>
     <message>
-        <source>Time2Go reports</source>
+        <source>Time sheet</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Start</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>End</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Break</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Work time</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -25,7 +25,7 @@ Time2GoReportListModel::Time2GoReportListModel(QObject *parent)
     : QAbstractListModel(parent),
       m_dbQueryExecutor(NULL),
       m_salt(rand()),
-      m_report_loaded(false),
+      m_report_requested(false),
       m_items()
 {
       m_dbQueryExecutor = QueryExecutor::GetInstance();
@@ -55,6 +55,8 @@ QVariant Time2GoReportListModel::data(const QModelIndex &index, int role) const
 
 void Time2GoReportListModel::clear()
 {
+    m_report_requested = false;
+
     beginResetModel();
     m_items.clear();
     endResetModel();
@@ -66,8 +68,13 @@ void Time2GoReportListModel::clear()
 
 void Time2GoReportListModel::loadReport()
 {
+    // clear and change salt so that an already requested load of data will not be taken over into the list model
+    m_salt = rand();
+    clear();
+
     // load work unit details from database
-    if (!m_report_loaded) {
+    if (!m_report_requested) {
+        m_report_requested = true;
         QVariantMap query;
         query["salt"] = m_salt;
         query["type"] = QueryType::LoadReport;
@@ -83,13 +90,13 @@ void Time2GoReportListModel::slot_dbQueryResults(QVariant query)
         switch (reply["type"].toInt()) {
         case QueryType::LoadReport: {
             if (reply["done"].toBool()) {
-                m_report_loaded = true;
                 ReportItem item(reply["uid"].toInt(),
                         reply["projectuid"].toInt(),
-                        reply["starttime"].toTime(),
-                reply["endtime"].toTime(),
-                reply["breaktime"].toInt(),
-                reply["worktime"].toInt());
+                        reply["day"].toString(),
+                        reply["starttime"].toString(),
+                        reply["endtime"].toString(),
+                        reply["breaktime"].toString(),
+                        reply["worktime"].toString());
                 addItemToListModel(item);
             }
             break;

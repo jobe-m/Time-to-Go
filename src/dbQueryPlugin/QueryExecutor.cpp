@@ -279,31 +279,47 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
 
 void QueryExecutor::loadReport(QVariantMap query)
 {
-    QSqlQuery sql("select * from workunits where start > date('now','start of month') or end > date('now','start of month');", m_db);
+//    QSqlQuery sql("SELECT * FROM workunits WHERE start > date('now','start of month') OR end > date('now','start of month') ORDER BY datetime(start) DESC;", m_db);
+    QSqlQuery sql("SELECT * FROM workunits ORDER BY datetime(start) DESC;", m_db);
     if (!sql.isValid()) {
         query["done"] = false;
         Q_EMIT actionDone(query);
     }
     while (sql.next()) {
-        int worktime = 0;
+        int workSeconds = 0;
+        int breakSeconds = 0;
         QDateTime start = sql.value(2).toDateTime();
-        QTime startTime = start.time();
-        qDebug() << "start time: " << startTime.toString();
-
         QDateTime end = sql.value(3).toDateTime();
-        QTime endTime = end.time();
-        qDebug() << "end time: " << endTime.toString();
+        workSeconds += start.secsTo(end);
 
-        worktime += startTime.msecsTo(endTime);
-        qDebug() << "Milliseconds: " << worktime;
+// TODO: calculate break time
 
         query["done"] = true;
         query["uid"] = sql.value(0).toInt();
         query["projectuid"] = sql.value(1).toInt();
-        query["starttime"] = startTime;
-        query["endtime"] = endTime;
-        query["breaktime"] = 0;
-        query["worktime"] = worktime;
+        if (workSeconds < (60*60*24)) {
+            query["day"] = start.toString("dddd, d. MMMM yyyy");
+        } else {
+            query["day"] = QString("%1 - %2")
+                    .arg(start.toString("dddd, d. MMM yyyy"))
+                    .arg(end.toString("dddd, d. MMM yyyy"));
+        }
+        query["starttime"] = start.toString("hh:mm");
+        if (end.isValid()) {
+            query["endtime"] = end.toString("hh:mm");
+            if (breakSeconds > 0) {
+                query["breaktime"] = QString("%1m").arg(0);
+            } else {
+                query["breaktime"] = QString("-");
+            }
+            query["worktime"] = QString("%1h %2m")
+                    .arg(workSeconds / (60*60), 2, 10, QLatin1Char('0'))
+                    .arg(workSeconds % 60, 2, 10, QLatin1Char('0'));
+        } else {
+            query["endtime"] = QString("--:--");
+            query["breaktime"] = QString("-");
+            query["worktime"] = QString("-");
+        }
         Q_EMIT actionDone(query);
     }
 }

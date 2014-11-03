@@ -102,6 +102,8 @@ Page {
             if (validEndDateTime) {
                 workDateTimeLine.setEndDateTime(end)
             }
+            applicationWindow.reportModel.loadReport()
+
             time2GoTimeCounterDay.reload()
         }
         onUnfinishedWorkUnit: {
@@ -153,14 +155,14 @@ Page {
                 }
             }
 
-            MenuItem {
-                enabled: mainPage.state === "CHECKED_IN"
-                visible: enabled
-                text: qsTr("Start break")
-                onClicked: {
-                    applicationWindow.startBreak()
-                }
-            }
+//            MenuItem {
+//                enabled: mainPage.state === "CHECKED_IN"
+//                visible: enabled
+//                text: qsTr("Start break")
+//                onClicked: {
+//                    applicationWindow.startBreak()
+//                }
+//            }
 
             MenuItem {
                 enabled: mainPage.state === "CHECKED_IN" || mainPage.state === "PAUSED"
@@ -174,14 +176,14 @@ Page {
                 }
             }
 
-            MenuItem {
-                enabled: mainPage.state === "PAUSED"
-                visible: enabled
-                text: qsTr("Stop break")
-                onClicked: {
-                    applicationWindow.stopBreak()
-                }
-            }
+//            MenuItem {
+//                enabled: mainPage.state === "PAUSED"
+//                visible: enabled
+//                text: qsTr("Stop break")
+//                onClicked: {
+//                    applicationWindow.stopBreak()
+//                }
+//            }
         }
 
         PushUpMenu {
@@ -190,10 +192,10 @@ Page {
                 onClicked: {}
             }
 
-            MenuItem {
-                text: qsTr("Settings")
-                onClicked: {}
-            }
+//            MenuItem {
+//                text: qsTr("Settings")
+//                onClicked: {}
+//            }
         }
 
         contentHeight: column.height
@@ -205,7 +207,7 @@ Page {
             spacing: Theme.paddingLarge
 
             PageHeader {
-                title: qsTr("Time2Go")
+                title: "Time2Go"
             }
 
             SectionHeader {
@@ -307,7 +309,7 @@ Page {
             }
 
             SectionHeader {
-                text: qsTr("Begin and end of work unit")
+                text: qsTr("Begin and end of latest work unit")
             }
 
             DateTimeLine {
@@ -323,21 +325,29 @@ Page {
                 }
             }
 
-            SectionHeader {
-                text: qsTr("Begin and end of break(s)")
-            }
+//            SectionHeader {
+//                text: qsTr("Begin and end of break(s)")
+//            }
         }
+    }
+
+//    Component {
+//        ReportPage {
+//            id: reportPage
+//        }
+//    }
+
+    Component.onCompleted: {
+//        pageStack.pushAttached(reportPage)
+//        pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
+        // Load latest work unit from database
+        time2GoWorkUnit.loadLatestWorkUnit()
     }
 
     onStatusChanged: {
         if (status === PageStatus.Active) {
             pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
         }
-    }
-
-    Component.onCompleted: {
-        // Load latest work unit from database
-        time2GoWorkUnit.loadLatestWorkUnit()
     }
 
     state: "CHECKED_OUT"
