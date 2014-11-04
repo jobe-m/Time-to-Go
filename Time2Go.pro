@@ -44,7 +44,7 @@ include(src/dbQueryPlugin/dbQueryPlugin.pri)
 #         - desktop icon filename must be changed
 #         - desktop filename must be changed
 #         - icon definition filename in desktop file must be changed
-TARGET = Time2Go
+TARGET = harbour-time2go
 
 CONFIG += sailfishapp
 
@@ -68,5 +68,5 @@ OTHER_FILES += \
 # to disable building translations every time, comment out the
 # following CONFIG line
 CONFIG += sailfishapp_i18n
-TRANSLATIONS += translations/Time2Go-de.ts
+TRANSLATIONS += translations/harbour-time2go-de_DE.ts
 
