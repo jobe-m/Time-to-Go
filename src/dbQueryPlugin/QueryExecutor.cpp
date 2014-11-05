@@ -314,7 +314,7 @@ void QueryExecutor::loadReport(QVariantMap query)
             }
             query["worktime"] = QString("%1h %2m")
                     .arg(workSeconds / (60*60), 2, 10, QLatin1Char('0'))
-                    .arg(workSeconds % 60, 2, 10, QLatin1Char('0'));
+                    .arg((workSeconds/60) % 60, 2, 10, QLatin1Char('0'));
         } else {
             query["endtime"] = QString("--:--");
             query["breaktime"] = QString("-");
