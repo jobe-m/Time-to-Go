@@ -54,11 +54,11 @@ SOURCES += \
 OTHER_FILES += \
     qml/cover/CoverPage.qml \
     qml/common/InfoPopup.qml \
-    rpm/Time2Go.changes.in \
-    rpm/Time2Go.spec \
-    rpm/Time2Go.yaml \
+    rpm/harbour-time2go.changes.in \
+    rpm/harbour-time2go.spec \
+    rpm/harbour-time2go.yaml \
     translations/*.ts \
-    Time2Go.desktop \
+    harbour-time2go.desktop \
     qml/pages/MainPage.qml \
     qml/scripts/Global.js \
     qml/pages/ReportPage.qml \
