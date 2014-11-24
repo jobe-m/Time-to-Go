@@ -38,27 +38,27 @@ ApplicationWindow
 
     // application global properties and functions
     function checkIn() {
-        coverPage.checkIn()
-        mainPage.checkIn()
-        uiUpdateTimer.restart()
+        var date = new Date()
+        coverPage.checkIn(date)
+        mainPage.checkIn(date)
     }
 
     function checkOut() {
-        coverPage.checkOut()
-        mainPage.checkOut()
-        uiUpdateTimer.stop()
+        var date = new Date()
+        coverPage.checkOut(date)
+        mainPage.checkOut(date)
     }
 
     function startBreak() {
-        Global.setBreakStart()
-        coverPage.startBreak()
-        mainPage.startBreak()
+        var date = new Date()
+        coverPage.startBreak(date)
+        mainPage.startBreak(date)
     }
 
     function stopBreak() {
-        Global.setBreakEnd()
-        coverPage.stopBreak()
-        mainPage.stopBreak()
+        var date = new Date()
+        coverPage.stopBreak(date)
+        mainPage.stopBreak(date)
     }
 
     function setProject(value) {
@@ -90,6 +90,7 @@ ApplicationWindow
 
     CoverPage {
         id: coverPage
+        activeProjectUid: 1
         onCheckedIn: applicationWindow.checkIn()
         onCheckedOut: applicationWindow.checkOut()
         onBreakStarted: applicationWindow.startBreak()
@@ -104,9 +105,7 @@ ApplicationWindow
         triggeredOnStart: true
         onTriggered: {
             coverPage.setWorkingTime(Global.getWorkingTime())
-            mainPage.setWorkingTime(Global.getWorkingTime())
             coverPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
-            mainPage.setBreakTime(Global.getBreakTime(), Global.getAutoBreakTime())
         }
     }
 
@@ -119,9 +118,6 @@ ApplicationWindow
         // initialize cover page
 // TODO set from settings
         coverPage.setMaxWorkingTime(60*60*10) // set to 10 hours
-//        coverPage.setActiveProject(Global.getActiveProject())
-        coverPage.setWorkingTime(Global.getWorkingTime())
-        coverPage.setBreakTime(Global.getBreakTime())
-//        mainPage.setActiveProject(Global.getActiveProject())
+        mainPage.setMaxWorkingTime(60*60*10)
     }
 }

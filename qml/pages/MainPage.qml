@@ -11,38 +11,30 @@ Page {
 
     property alias activeProjectUid: time2GoActiveProject.uid
 
-    function checkIn() {
+    function checkIn(date) {
         state = "CHECKED_IN"
-        var now = new Date()
         workDateTimeLine.reset()
-        workDateTimeLine.setStartDateTime(now)
+        workDateTimeLine.setStartDateTime(date)
         time2GoWorkUnit.reset()
         time2GoWorkUnit.projectUid = time2GoActiveProject.uid
-        time2GoWorkUnit.start = now
+        time2GoWorkUnit.start = date
         time2GoWorkUnit.save()
     }
 
-    function checkOut() {
+    function checkOut(date) {
         state = "CHECKED_OUT"
-        var now = new Date()
-        workDateTimeLine.setEndDateTime(now)
-        time2GoWorkUnit.end = now
+        workDateTimeLine.setEndDateTime(date)
+        time2GoWorkUnit.end = date
         time2GoWorkUnit.save()
         time2GoTimeCounterDay.reload()
     }
 
-    function startBreak() {
+    function startBreak(date) {
         state = "PAUSED"
     }
 
-    function stopBreak() {
+    function stopBreak(date) {
         state = "CHECKED_IN"
-    }
-
-    // This function set working time in seconds
-    function setWorkingTime(value) {
-        if (state === "CHECKED_IN") {
-        }
     }
 
     // This function set break time in seconds
@@ -79,6 +71,11 @@ Page {
         }
     }
 
+    // This function set max working hours per day in seconds
+    function setMaxWorkingTime(value) {
+        __maxWorkingTime = value
+    }
+
     // internal
     property int __maxWorkingTime: 60*60*9999 // in seconds
     property int __workingTime: 0 // in seconds
@@ -87,7 +84,7 @@ Page {
         id: time2GoActiveProject
 
         onDbQueryError: {
-            console.log("Time2GoProject error: " + errorText)
+            console.log("MainPage - Time2GoProject error: " + errorText)
         }
     }
 
@@ -105,11 +102,13 @@ Page {
             applicationWindow.reportModel.loadReport()
 
             time2GoTimeCounterDay.reload()
+            applicationWindow.cover.workTimeReload()
         }
         onUnfinishedWorkUnit: {
             // on application start set check in if there is a workunit with no end date time
             console.log("Unfinished work unit, set to CHECKED_IN")
             state = "CHECKED_IN"
+            applicationWindow.cover.checkIn()
         }
     }
 
@@ -255,6 +254,7 @@ Page {
                     color: __workingTime > __maxWorkingTime ?
                                "red" : (mainPage.state === "CHECKED_IN" ?
                                             Theme.primaryColor : Theme.secondaryColor)
+                    opacity: mainPage.state === "CHECKED_IN" ? 1.0 : 0.6
                 }
 
                 Label {
@@ -338,8 +338,6 @@ Page {
 //    }
 
     Component.onCompleted: {
-//        pageStack.pushAttached(reportPage)
-//        pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
         // Load latest work unit from database
         time2GoWorkUnit.loadLatestWorkUnit()
     }

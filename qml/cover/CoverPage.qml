@@ -1,9 +1,33 @@
+/***************************************************************************
+**
+** Copyright (C) 2014 Marko Koschak (marko.koschak@tisno.de)
+** All rights reserved.
+**
+** This file is part of Time2Go.
+**
+** Time2Go is free software: you can redistribute it and/or modify
+** it under the terms of the GNU General Public License as published by
+** the Free Software Foundation, either version 2 of the License, or
+** (at your option) any later version.
+**
+** Time2Go is distributed in the hope that it will be useful,
+** but WITHOUT ANY WARRANTY; without even the implied warranty of
+** MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+** GNU General Public License for more details.
+**
+** You should have received a copy of the GNU General Public License
+** along with Time2Go. If not, see <http://www.gnu.org/licenses/>.
+**
+***************************************************************************/
 
 import QtQuick 2.0
 import Sailfish.Silica 1.0
+import harbour.Time2Go.DatabaseQuery 1.0
 
 CoverBackground {
     id: coverPage
+
+    property alias activeProjectUid: time2GoActiveProject.uid
 
     signal checkedIn()
     signal checkedOut()
@@ -20,19 +44,6 @@ CoverBackground {
     function setActiveProject(value) {
         if (state === "CHECKED_OUT") {
             projectName.text = value
-        }
-    }
-
-    // This function set working time in seconds
-    function setWorkingTime(value) {
-        if (state === "CHECKED_IN") {
-            __workingTime = value
-            var sec = value
-            var min = (sec/60).toFixedDown(0)
-            var hour = (min/60).toFixedDown(0)
-            workingTime.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
-                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
         }
     }
 
@@ -100,6 +111,11 @@ CoverBackground {
         }
     }
 
+    // This function needs to be called if a new time work time stamp was recorded
+    function workTimeReload() {
+        time2GoWorkTimeCounter.reload()
+    }
+
     // internal stuff following here
     property string __prev_state: ""
     property int __maxWorkingTime: 60*60*9999 // in seconds
@@ -116,6 +132,32 @@ CoverBackground {
     anchors.centerIn: parent
     width: Theme.coverSizeLarge.width
     height: Theme.coverSizeLarge.height
+
+    Time2GoProject {
+        id: time2GoActiveProject
+
+        onDbQueryError: {
+            console.log("Cover - Time2GoProject error: " + errorText)
+        }
+    }
+
+    Time2GoTimeCounter {
+        id: time2GoWorkTimeCounter
+        projectUid: time2GoActiveProject.uid
+
+        onWorkTimeChanged: {
+            __workingTime = workTime
+            var sec = workTime
+            var min = (sec/60).toFixedDown(0)
+            var hour = (min/60).toFixedDown(0)
+            workingTime.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
+                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+        }
+        onBreakTimeChanged: {
+
+        }
+    }
 
     Image {
         width: parent.width * 0.85
@@ -179,6 +221,7 @@ CoverBackground {
             wrapMode: Text.NoWrap
             font.family: Theme.fontFamily
             font.pixelSize: Theme.fontSizeLarge
+            text: time2GoActiveProject.name
         }
 
         OpacityRampEffect {
