@@ -32,6 +32,7 @@ Time2GoTimeCounter::Time2GoTimeCounter(QObject *parent) :
     m_project_uid(0),
     m_work_time(),
     m_break_time(),
+    m_type(DAY),
     m_time_running(false),
     m_update_interval(1000)
 {
@@ -103,12 +104,35 @@ void Time2GoTimeCounter::setUpdateInterval(const int value)
     m_updateTimer->setInterval(value);
 }
 
+void Time2GoTimeCounter::setType(const int value)
+{
+    if ((value > enumMIN) && (value < enumMAX)) {
+        m_type = value;
+    }
+}
+
 void Time2GoTimeCounter::reload()
 {
     // Load work unit details from database
     QVariantMap query;
     query["salt"] = m_salt;
-    query["counter"] = QueryType::Day;
+    switch (m_type) {
+    case DAY:
+        query["counter"] = QueryType::COUNTER_DAY;
+        break;
+    case WEEK:
+        query["counter"] = QueryType::COUNTER_WEEK;
+        break;
+    case MONTH:
+        query["counter"] = QueryType::COUNTER_MONTH;
+        break;
+    case ALL:
+        query["counter"] = QueryType::COUNTER_ALL;
+        break;
+    default:
+        query["counter"] = QueryType::COUNTER_INDIVIDUAL;
+        break;
+    }
     query["type"] = QueryType::LoadTimeCounter;
     query["projectuid"] = m_project_uid;
     m_dbQueryExecutor->queueAction(query);

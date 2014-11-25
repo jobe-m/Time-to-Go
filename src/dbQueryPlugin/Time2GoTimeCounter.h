@@ -29,11 +29,22 @@ class Time2GoTimeCounter : public QObject
 {
     Q_OBJECT
 public:
-    Q_ENUMS()
+    Q_ENUMS(eCounterType)
+    enum eCounterType {
+        enumMIN = 0,
+        DAY,
+        WEEK,
+        MONTH,
+        ALL,
+        INDIVIDUAL,
+        enumMAX
+    };
+
     Q_PROPERTY(int projectUid READ projectUid WRITE setProjectUid NOTIFY projectUidChanged)
     Q_PROPERTY(int workTime READ workTime NOTIFY workTimeChanged)
     Q_PROPERTY(int breakTime READ breakTime NOTIFY breakTimeChanged)
     Q_PROPERTY(int updateInterval READ updateInterval WRITE setUpdateInterval)
+    Q_PROPERTY(int type READ type WRITE setType NOTIFY typeChanged)
 
     Q_INVOKABLE void reload();
 
@@ -46,12 +57,15 @@ public:
     int breakTime() { return m_break_time / 1000; }
     int updateInterval() { return m_update_interval; }
     void setUpdateInterval(const int value);
+    int type() { return m_type; }
+    void setType(const int value);
 
 signals:
     void uidChanged();
     void projectUidChanged();
     void workTimeChanged();
     void breakTimeChanged();
+    void typeChanged();
     void dbQueryError(const QString errorText);
 
 public slots:
@@ -72,6 +86,7 @@ private:
     int m_project_uid;
     int m_work_time; // stored in milliseconds
     int m_break_time; // stored in milliseconds
+    int m_type;
     bool m_time_running;
     int m_update_interval; // stored in milliseconds
 };

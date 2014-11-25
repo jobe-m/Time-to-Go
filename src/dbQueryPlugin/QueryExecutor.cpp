@@ -72,7 +72,6 @@ void QueryExecutor::processAction(QVariant message) {
 void QueryExecutor::processQuery(const QVariant &msg)
 {
     QVariantMap query = msg.toMap();
-//    qDebug() << "QE Processing query:" << query;
     if (!query.isEmpty()) {
         switch (query["type"].toInt()) {
         case QueryType::LoadProject: { loadProject(query); break; }
@@ -82,7 +81,9 @@ void QueryExecutor::processQuery(const QVariant &msg)
         case QueryType::LoadLatestWorkUnit: { loadLatestWorkUnit(query); break; }
         case QueryType::LoadTimeCounter: { loadTimeCounter(query); break; }
         case QueryType::LoadReport: { loadReport(query); break; }
-        default: { break; }
+        default:
+            // Request out of range, do nothing
+            return;
         }
     }
 }
@@ -226,12 +227,30 @@ QueryExecutor* QueryExecutor::GetInstance()
 
 void QueryExecutor::loadTimeCounter(QVariantMap query)
 {
+    QString sqlQuery();
     int seconds = 0;
     query["running"] = false;
 
 // TODO take projectUid into account
     //query["projectuid"]
-    QSqlQuery sql("select start, end from workunits where start > date('now') or end > date('now','+2 hour');", m_db);
+
+    switch (query["counter"]) {
+    case CounterType::Day:
+        sqlQuery = "select start, end from workunits where start > date('now') or end > date('now','+2 hour');";
+        break;
+    case CounterType::Week:
+        break;
+    case CounterType::Month:
+        sqlQuery = "select start, end from workunits where start > date('now','start of month') or end > date('now','start of month','+2 hour');";
+        break;
+    case CounterType::Individual:
+        break;
+    default:
+        // Request out of range, to nothing
+        return;
+    }
+
+    QSqlQuery sql(sqlQuery, m_db);
     while (sql.next()) {
         qDebug() << "work unit start: " << sql.value(0).toString() << " end: " << sql.value(1).toString();
         QDateTime start = sql.value(0).toDateTime();

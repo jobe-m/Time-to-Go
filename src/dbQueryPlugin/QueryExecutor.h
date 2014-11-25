@@ -9,29 +9,42 @@
 #include "ThreadWorker.h"
 
 namespace QueryType {
-    enum EnumType {
-        LoadProject = 1,
-        LoadWorkUnit,
-        LoadBreak,
-        SaveProject,
-        SaveWorkUnit,
-        SaveBreak,
-        LoadLatestWorkUnit,
-        LoadTimeCounter,
-        LoadReport
-    };
-    enum EnumCounterType {
-        Day,
-        Week,
-        Month,
-        Individual
-    };
-    enum EnumReportType {
-        All,
-        CurrentYear,
-        CurrentMonth,
-        CurrentWeek
-    };
+enum eType {
+    enumMin = 0,
+    LoadProject,
+    LoadWorkUnit,
+    LoadBreak,
+    SaveProject,
+    SaveWorkUnit,
+    SaveBreak,
+    LoadLatestWorkUnit,
+    LoadTimeCounter,
+    LoadReport,
+    enumMax
+};
+}
+
+namespace CounterType {
+enum eCounterType {
+    enumMin = 0,
+    Day,
+    Week,
+    Month,
+    All,
+    Individual,
+    enumMax
+};
+}
+
+namespace ReportType {
+enum eReportType {
+    enumMin,
+    All,
+    CurrentYear,
+    CurrentMonth,
+    CurrentWeek,
+    enumMax
+};
 }
 
 class QueryExecutor : public QObject
