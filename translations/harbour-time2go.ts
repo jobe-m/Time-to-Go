@@ -41,6 +41,17 @@
     </message>
 </context>
 <context>
+    <name>ReportListItem</name>
+    <message>
+        <source>Edit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Delete</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
     <name>ReportPage</name>
     <message>
         <source>Time sheet</source>

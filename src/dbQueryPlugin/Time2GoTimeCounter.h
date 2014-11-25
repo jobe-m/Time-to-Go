@@ -32,11 +32,11 @@ public:
     Q_ENUMS(eCounterType)
     enum eCounterType {
         enumMIN = 0,
-        DAY,
-        WEEK,
-        MONTH,
-        ALL,
-        INDIVIDUAL,
+        Day,
+        Week,
+        Month,
+        All,
+        Individual,
         enumMAX
     };
 

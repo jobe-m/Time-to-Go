@@ -32,7 +32,7 @@ Time2GoTimeCounter::Time2GoTimeCounter(QObject *parent) :
     m_project_uid(0),
     m_work_time(),
     m_break_time(),
-    m_type(DAY),
+    m_type(Day),
     m_time_running(false),
     m_update_interval(1000)
 {
@@ -117,20 +117,20 @@ void Time2GoTimeCounter::reload()
     QVariantMap query;
     query["salt"] = m_salt;
     switch (m_type) {
-    case DAY:
-        query["counter"] = QueryType::COUNTER_DAY;
+    case Day:
+        query["counter"] = CounterType::Day;
         break;
-    case WEEK:
-        query["counter"] = QueryType::COUNTER_WEEK;
+    case Week:
+        query["counter"] = CounterType::Week;
         break;
-    case MONTH:
-        query["counter"] = QueryType::COUNTER_MONTH;
+    case Month:
+        query["counter"] = CounterType::Month;
         break;
-    case ALL:
-        query["counter"] = QueryType::COUNTER_ALL;
+    case All:
+        query["counter"] = CounterType::All;
         break;
     default:
-        query["counter"] = QueryType::COUNTER_INDIVIDUAL;
+        query["counter"] = CounterType::Individual;
         break;
     }
     query["type"] = QueryType::LoadTimeCounter;

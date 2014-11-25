@@ -227,15 +227,16 @@ QueryExecutor* QueryExecutor::GetInstance()
 
 void QueryExecutor::loadTimeCounter(QVariantMap query)
 {
-    QString sqlQuery();
+    QString sqlQuery;
     int seconds = 0;
     query["running"] = false;
 
 // TODO take projectUid into account
     //query["projectuid"]
 
-    switch (query["counter"]) {
+    switch (query["counter"].toInt()) {
     case CounterType::Day:
+        qDebug() << "day";
         sqlQuery = "select start, end from workunits where start > date('now') or end > date('now','+2 hour');";
         break;
     case CounterType::Week:
@@ -247,6 +248,7 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         break;
     default:
         // Request out of range, to nothing
+        qDebug() << "Request out of range";
         return;
     }
 

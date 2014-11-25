@@ -63,7 +63,8 @@ OTHER_FILES += \
     qml/scripts/Global.js \
     qml/pages/ReportPage.qml \
     qml/common/DateTimeLine.qml \
-    qml/Main.qml
+    qml/Main.qml \
+    qml/common/ReportListItem.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line

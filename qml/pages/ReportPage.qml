@@ -2,7 +2,7 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
 import harbour.Time2Go.DatabaseQuery 1.0
-
+import "../common"
 
 Page {
     id: reportPage
@@ -68,6 +68,7 @@ Page {
                 text: section
                 font.pixelSize: Theme.fontSizeExtraSmall
                 color: Theme.primaryColor
+                opacity: 0.6
             }
 
             Rectangle {
@@ -78,43 +79,7 @@ Page {
             }
         }
 
-        delegate: BackgroundItem {
-            id: delegate
-
-            Label {
-                x: Theme.paddingLarge
-                anchors.verticalCenter: parent.verticalCenter
-                text: model.workstart
-                font.pixelSize: Theme.fontSizeMedium
-                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
-            }
-
-            Label {
-                x: Theme.paddingLarge * 5
-                anchors.verticalCenter: parent.verticalCenter
-                text: model.workend
-                font.pixelSize: Theme.fontSizeMedium
-                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
-            }
-
-            Label {
-                x: Theme.paddingLarge * 13
-                anchors.verticalCenter: parent.verticalCenter
-                text: model.breaktime
-                font.pixelSize: Theme.fontSizeMedium
-                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
-            }
-
-            Label {
-                x: Theme.paddingLarge * 17
-                anchors.verticalCenter: parent.verticalCenter
-                text: model.worktime
-                font.pixelSize: Theme.fontSizeMedium
-                color: delegate.highlighted ? Theme.highlightColor : Theme.primaryColor
-            }
-
-            onClicked: {}
-        }
+        delegate: ReportListItem {}
 
         VerticalScrollDecorator {}
     }

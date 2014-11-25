@@ -120,6 +120,7 @@ Page {
     Time2GoTimeCounter {
         id: time2GoTimeCounterDay
         projectUid: time2GoActiveProject.uid
+        type: Time2GoTimeCounter.Day
 
         onWorkTimeChanged: {
             __workingTime = workTime
@@ -135,11 +136,23 @@ Page {
         }
     }
 
-//    Time2GoWorkingTimeWeek {
-//    }
+    Time2GoTimeCounter {
+        id: time2GoTimeCounterMonth
+        projectUid: time2GoActiveProject.uid
+        type: Time2GoTimeCounter.Month
 
-//    Time2GoWorkingTimeMonth {
-//    }
+        onWorkTimeChanged: {
+            var sec = workTime
+            var min = (sec/60).toFixedDown(0)
+            var hour = (min/60).toFixedDown(0)
+            workingTimeMonth.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
+                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+        }
+        onBreakTimeChanged: {
+
+        }
+    }
 
     SilicaFlickable {
         anchors.fill: parent
@@ -284,7 +297,7 @@ Page {
                     anchors.right: parent.right
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeMedium
-                    text: "13:20"
+                    text: "--:--"
                 }
 
                 Label {
@@ -304,7 +317,7 @@ Page {
                     anchors.right: parent.right
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeMedium
-                    text: "124:37"
+                    text: "--:--"
                 }
             }
 
