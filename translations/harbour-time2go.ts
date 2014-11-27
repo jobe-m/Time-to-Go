@@ -24,10 +24,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Day</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Week</source>
         <translation type="unfinished"></translation>
     </message>
@@ -37,6 +33,10 @@
     </message>
     <message>
         <source>Begin and end of latest work unit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Today</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

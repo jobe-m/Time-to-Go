@@ -78,6 +78,7 @@ void QueryExecutor::processQuery(const QVariant &msg)
         case QueryType::SaveProject: { saveProject(query); break; }
         case QueryType::LoadWorkUnit: { loadWorkUnit(query); break; }
         case QueryType::SaveWorkUnit: { saveWorkUnit(query); break; }
+        case QueryType::DeleteWorkUnit: { deleteWorkUnit(query); break; }
         case QueryType::LoadLatestWorkUnit: { loadLatestWorkUnit(query); break; }
         case QueryType::LoadTimeCounter: { loadTimeCounter(query); break; }
         case QueryType::LoadReport: { loadReport(query); break; }
@@ -152,6 +153,26 @@ void QueryExecutor::saveProject(QVariantMap query)
 void QueryExecutor::loadWorkUnit(QVariantMap query)
 {
 
+}
+
+void QueryExecutor::deleteWorkUnit(QVariantMap query)
+{
+    QSqlQuery sql(m_db);
+    query["done"] = false;
+    int uid = query["uid"].toInt();
+    if (0 != uid) {
+        // Delete work unit
+        sql.prepare("DELETE FROM workunits WHERE uid=:uid;");
+        sql.bindValue(":uid", uid);
+        sql.exec();
+        if (sql.lastError().type() == QSqlError::NoError ) {
+            query["done"] = true;
+        } else {
+            query["error"] = sql.lastError().text();
+        }
+    }
+    // Send result back to QML world
+    Q_EMIT actionDone(query);
 }
 
 void QueryExecutor::saveWorkUnit(QVariantMap query)
@@ -229,12 +250,13 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
 {
     QString sqlQuery;
     int seconds = 0;
+    int counterType = query["counter"].toInt();
     query["running"] = false;
 
 // TODO take projectUid into account
     //query["projectuid"]
 
-    switch (query["counter"].toInt()) {
+    switch (counterType) {
     case CounterType::Day:
         qDebug() << "day";
         sqlQuery = "select start, end from workunits where start > date('now') or end > date('now','+2 hour');";
@@ -242,6 +264,7 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
     case CounterType::Week:
         break;
     case CounterType::Month:
+        qDebug() << "month";
         sqlQuery = "select start, end from workunits where start > date('now','start of month') or end > date('now','start of month','+2 hour');";
         break;
     case CounterType::Individual:
@@ -261,9 +284,9 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         if (!start.date().isValid() || start.date() > QDate::currentDate()) {
             continue;
         }
-        // Check start date if it is before today
+        // If day counter: Check start date if it is before today
         // If yes -> set to midnight
-        if (start.date() < QDate::currentDate()) {
+        if ((counterType == CounterType::Day) && (start.date() < QDate::currentDate())) {
             startTime = QTime(0, 0, 0, 0);
         }
         qDebug() << "start time: " << startTime.toString();
@@ -275,13 +298,13 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
             query["running"] = true;
             endTime = QTime::currentTime();
         } else
-        // Sanity check for end date from any day before today -> discard this work unit
-        if (end.date() < QDate::currentDate()) {
+        // If day counter: Sanity check for end date from any day before today -> discard this work unit
+        if ((counterType == CounterType::Day) && (end.date() < QDate::currentDate())) {
             continue;
         } else
-        // Check if end date is after today
+        // If day counter: Check if end date is after today
         // If yes -> set to one second before next midnight
-        if (end.date() > QDate::currentDate()) {
+        if ((counterType == CounterType::Day) && (end.date() > QDate::currentDate())) {
             endTime = QTime(23,59,59,999);
         }
         qDebug() << "end time: " << endTime.toString();

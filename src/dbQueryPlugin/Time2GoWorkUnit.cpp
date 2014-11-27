@@ -81,6 +81,16 @@ void Time2GoWorkUnit::save()
     saveWorkUnit();
 }
 
+void Time2GoWorkUnit::deleteWorkUnit()
+{
+    // send deletion request to database
+    QVariantMap query;
+    query["salt"] = m_salt;
+    query["type"] = QueryType::DeleteWorkUnit;
+    query["uid"] = m_uid;
+    m_dbQueryExecutor->queueAction(query);
+}
+
 // With setWorkUnit all work unit details will be saved to database
 void Time2GoWorkUnit::saveWorkUnit()
 {
@@ -115,7 +125,7 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
                 m_notes = reply["notes"].toString();
                 Q_EMIT timeChanged();
             } else {
-                Q_EMIT dbQueryError(reply["error"].toString());
+                Q_EMIT dbQueryError(LoadError, reply["error"].toString());
             }
             break;
         }
@@ -124,11 +134,18 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
                 // Save uid of object stored in database, so that next time saving we can rever to it
                 m_uid = reply["uid"].toInt();
                 Q_EMIT timeChanged();
-                Q_EMIT saved(0, "");
             } else {
-                Q_EMIT saved(1, reply["error"].toString());
+                Q_EMIT dbQueryError(SaveError, reply["error"].toString());
             }
             break;
+        }
+        case QueryType::DeleteWorkUnit: {
+            if (reply["done"].toBool()) {
+                // reset this object
+                reset();
+            } else {
+                Q_EMIT dbQueryError(DeleteError, reply["error"].toString());
+            }
         }
         }
     }

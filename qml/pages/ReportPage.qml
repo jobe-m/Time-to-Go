@@ -84,6 +84,10 @@ Page {
         VerticalScrollDecorator {}
     }
 
+    Time2GoWorkUnit {
+        id: workUnitForDeletion
+    }
+
     // The delegate for each section header
 
     Component.onCompleted: {

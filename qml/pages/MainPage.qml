@@ -10,6 +10,8 @@ Page {
     id: mainPage
 
     property alias activeProjectUid: time2GoActiveProject.uid
+    property bool showSecondsDaylyCounter: true
+    property bool showSecondsMonthlyCounter: false
 
     function checkIn(date) {
         state = "CHECKED_IN"
@@ -27,6 +29,7 @@ Page {
         time2GoWorkUnit.end = date
         time2GoWorkUnit.save()
         time2GoTimeCounterDay.reload()
+        time2GoTimeCounterMonth.reload()
     }
 
     function startBreak(date) {
@@ -102,6 +105,7 @@ Page {
             applicationWindow.reportModel.loadReport()
 
             time2GoTimeCounterDay.reload()
+            time2GoTimeCounterMonth.reload()
             applicationWindow.cover.workTimeReload()
         }
         onUnfinishedWorkUnit: {
@@ -127,9 +131,10 @@ Page {
             var sec = workTime
             var min = (sec/60).toFixedDown(0)
             var hour = (min/60).toFixedDown(0)
-            workingTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
-                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+            workingTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
+                    (showSecondsDaylyCounter ?
+                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
         }
         onBreakTimeChanged: {
 
@@ -145,9 +150,10 @@ Page {
             var sec = workTime
             var min = (sec/60).toFixedDown(0)
             var hour = (min/60).toFixedDown(0)
-            workingTimeMonth.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
-                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+            workingTimeMonth.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
+                    (showSecondsMonthlyCounter ?
+                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
         }
         onBreakTimeChanged: {
 
@@ -253,7 +259,7 @@ Page {
                     width: parent.width * 2/3
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeExtraSmall
-                    text: qsTr("Day")
+                    text: qsTr("Today")
                 }
 
                 Label {

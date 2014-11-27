@@ -29,6 +29,13 @@ class Time2GoWorkUnit : public QObject
 {
     Q_OBJECT
 public:
+    Q_ENUMS(eErrorType)
+    enum eErrorType {
+        LoadError,
+        SaveError,
+        DeleteError
+    };
+
     Q_PROPERTY(int uid READ uid WRITE setUid NOTIFY uidChanged)
     Q_PROPERTY(int projectUid READ projectUid WRITE setProjectUid NOTIFY projectUidChanged)
     Q_PROPERTY(QDateTime start READ start WRITE setStart NOTIFY startChanged)
@@ -40,6 +47,7 @@ public:
     Q_INVOKABLE void save();
     Q_INVOKABLE void reset();
     Q_INVOKABLE void loadLatestWorkUnit();
+    Q_INVOKABLE void deleteWorkUnit();
 
     explicit Time2GoWorkUnit(QObject *parent = 0);
     virtual ~Time2GoWorkUnit();
@@ -63,8 +71,7 @@ signals:
     void startChanged();
     void endChanged();
     void notesChanged();
-    void dbQueryError(const QString errorText);
-    void saved(int result, const QString errorText);
+    void dbQueryError(int errorType, const QString errorText);
     void unfinishedWorkUnit();
     void timeChanged();
 

@@ -13,6 +13,7 @@ enum eType {
     enumMin = 0,
     LoadProject,
     LoadWorkUnit,
+    DeleteWorkUnit,
     LoadBreak,
     SaveProject,
     SaveWorkUnit,
@@ -68,6 +69,7 @@ private:
     void saveProject(QVariantMap query);
     void loadWorkUnit(QVariantMap query);
     void saveWorkUnit(QVariantMap query);
+    void deleteWorkUnit(QVariantMap query);
     void loadLatestWorkUnit(QVariantMap query);
     void loadTimeCounter(QVariantMap query);
     void loadReport(QVariantMap query);

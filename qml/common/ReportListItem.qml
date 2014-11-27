@@ -15,8 +15,8 @@ ListItem {
     width: parent ? parent.width : screen.width
 
     function listItemRemove() {
-//        kdbGroupForDeletion.groupId = model.uid
-        remorseAction("Deleting work unit", function() { /*kdbGroupForDeletion.deleteGroup()*/ })
+        workUnitForDeletion.uid = model.uid
+        remorseAction("Deleting work unit", function() { workUnitForDeletion.deleteWorkUnit() })
     }
 
     ListView.onAdd: AddAnimation {
@@ -25,6 +25,7 @@ ListItem {
     ListView.onRemove: RemoveAnimation {
         target: reportListItem
     }
+
 
     Label {
         x: Theme.paddingLarge
@@ -59,7 +60,7 @@ ListItem {
     }
 
     onClicked: {
-//        pageStack.push(Qt.resolvedUrl(".qml").toString(),
+//        pageStack.push(Qt.resolvedUrl("EditWorkUnitDialog.qml").toString(),
 //                       { "uid": model.uid })
     }
 
