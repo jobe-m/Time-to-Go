@@ -117,7 +117,7 @@ ApplicationWindow
     Component.onCompleted: {
         // initialize cover page
 // TODO set from settings
-        coverPage.setMaxWorkingTime(60*60*10) // set to 10 hours
-        mainPage.setMaxWorkingTime(60*60*10)
+        coverPage.setMaxWorkingTime(60*60*10+60*45) // set to 10:45 hours in seconds
+        mainPage.setMaxWorkingTime(60*60*10+60*45)
     }
 }
