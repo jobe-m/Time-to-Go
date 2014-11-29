@@ -66,7 +66,7 @@ void Time2GoTimeCounter::dbQueryResults(QVariant query)
     if (m_salt == reply["salt"].toInt()) {
         switch (reply["type"].toInt()) {
         case QueryType::LoadTimeCounter: {
-            qDebug() << "LoadTimeCounter: " << reply;
+//            qDebug() << "LoadTimeCounter: " << reply;
             if (m_project_uid != reply["projectuid"].toInt()) {
                 m_project_uid = reply["projectuid"].toInt();
                 Q_EMIT projectUidChanged();

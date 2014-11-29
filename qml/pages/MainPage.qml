@@ -10,7 +10,7 @@ Page {
     id: mainPage
 
     property alias activeProjectUid: time2GoActiveProject.uid
-    property bool showSecondsDaylyCounter: true
+    property bool showSecondsDailyCounter: true
     property bool showSecondsMonthlyCounter: false
 
     function checkIn(date) {
@@ -102,6 +102,7 @@ Page {
             if (validEndDateTime) {
                 workDateTimeLine.setEndDateTime(end)
             }
+            console.log("Reload report model from workunit onTimeChanged")
             applicationWindow.reportModel.loadReport()
 
             time2GoTimeCounterDay.reload()
@@ -133,7 +134,7 @@ Page {
             var hour = (min/60).toFixedDown(0)
             workingTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
                     (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
-                    (showSecondsDaylyCounter ?
+                    (showSecondsDailyCounter ?
                          " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
         }
         onBreakTimeChanged: {
@@ -358,11 +359,15 @@ Page {
 
     Component.onCompleted: {
         // Load latest work unit from database
+        console.log("Load latest work unit")
         time2GoWorkUnit.loadLatestWorkUnit()
     }
 
     onStatusChanged: {
-        if (status === PageStatus.Active) {
+        if (status === PageStatus.Active && !applicationWindow._reportPageLoaded) {
+            // Set in global object to not load report page twice, it will crash otherwise
+            applicationWindow._reportPageLoaded = true
+            console.log("pageStack push ReportPage")
             pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
         }
     }

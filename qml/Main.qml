@@ -36,6 +36,9 @@ ApplicationWindow
     property MainPage mainPage: null
     property Time2GoReportListModel reportModel: null
 
+    // internal
+    property bool _reportPageLoaded: false
+
     // application global properties and functions
     function checkIn() {
         var date = new Date()

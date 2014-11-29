@@ -107,7 +107,7 @@ void Time2GoReportListModel::slot_dbQueryResults(QVariant query)
 
 void Time2GoReportListModel::addItemToListModel(const ReportItem &item)
 {
-    qDebug() << item.m_work_start << item.m_work_end;
+//    qDebug() << item.m_work_start << item.m_work_end;
     // append new entry to end of list
     beginInsertRows(QModelIndex(), rowCount(), rowCount());
     m_items << item;

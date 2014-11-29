@@ -91,7 +91,7 @@ Page {
     // The delegate for each section header
 
     Component.onCompleted: {
-        console.log("Load report")
-        applicationWindow.reportModel.loadReport()
+//        console.log("Reload report model from ReportPage onCompleted")
+//        applicationWindow.reportModel.loadReport()
     }
 }

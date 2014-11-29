@@ -258,26 +258,26 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
 
     switch (counterType) {
     case CounterType::Day:
-        qDebug() << "day";
+//        qDebug() << "day";
         sqlQuery = "select start, end from workunits where start > date('now') or end > date('now','+2 hour');";
         break;
     case CounterType::Week:
         break;
     case CounterType::Month:
-        qDebug() << "month";
+//        qDebug() << "month";
         sqlQuery = "select start, end from workunits where start > date('now','start of month') or end > date('now','start of month','+2 hour');";
         break;
     case CounterType::Individual:
         break;
     default:
         // Request out of range, to nothing
-        qDebug() << "Request out of range";
+        qDebug() << "ERROR: Request out of range";
         return;
     }
 
     QSqlQuery sql(sqlQuery, m_db);
     while (sql.next()) {
-        qDebug() << "work unit start: " << sql.value(0).toString() << " end: " << sql.value(1).toString();
+//        qDebug() << "work unit start: " << sql.value(0).toString() << " end: " << sql.value(1).toString();
         QDateTime start = sql.value(0).toDateTime();
         QTime startTime = start.time();
         // Sanity check for validity and start date from future -> discard this work unit
@@ -289,7 +289,7 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         if ((counterType == CounterType::Day) && (start.date() < QDate::currentDate())) {
             startTime = QTime(0, 0, 0, 0);
         }
-        qDebug() << "start time: " << startTime.toString();
+//        qDebug() << "start time: " << startTime.toString();
 
         QDateTime end = sql.value(1).toDateTime();
         QTime endTime = end.time();
@@ -307,10 +307,10 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         if ((counterType == CounterType::Day) && (end.date() > QDate::currentDate())) {
             endTime = QTime(23,59,59,999);
         }
-        qDebug() << "end time: " << endTime.toString();
+//        qDebug() << "end time: " << endTime.toString();
 
         seconds += startTime.msecsTo(endTime);
-        qDebug() << "Milliseconds: " << seconds;
+//        qDebug() << "Milliseconds: " << seconds;
     }
     query["worktime"] = seconds;
     // Send result back to QML world
