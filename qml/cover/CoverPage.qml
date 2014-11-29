@@ -28,6 +28,8 @@ CoverBackground {
     id: coverPage
 
     property alias activeProjectUid: time2GoActiveProject.uid
+    property bool showSecondsWorkTime: false
+    property bool showSecondsBreakTime: false
 
     signal checkedIn()
     signal checkedOut()
@@ -150,9 +152,10 @@ CoverBackground {
             var sec = workTime
             var min = (sec/60).toFixedDown(0)
             var hour = (min/60).toFixedDown(0)
-            workingTime.text = (hour < 10 ? "0" : "") + (hour).toString() + ":" +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + ":" +
-                    (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+            workingTime.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
+                    (showSecondsWorkTime ?
+                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
         }
         onBreakTimeChanged: {
 
