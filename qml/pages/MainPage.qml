@@ -11,6 +11,7 @@ Page {
 
     property alias activeProjectUid: time2GoActiveProject.uid
     property bool showSecondsDailyCounter: true
+    property bool showSecondsWeeklyCounter: false
     property bool showSecondsMonthlyCounter: false
 
     function checkIn(date) {
@@ -29,6 +30,7 @@ Page {
         time2GoWorkUnit.end = date
         time2GoWorkUnit.save()
         time2GoTimeCounterDay.reload()
+        time2GoTimeCounterWeek.reload()
         time2GoTimeCounterMonth.reload()
     }
 
@@ -106,6 +108,7 @@ Page {
             applicationWindow.reportModel.loadReport()
 
             time2GoTimeCounterDay.reload()
+            time2GoTimeCounterWeek.reload()
             time2GoTimeCounterMonth.reload()
             applicationWindow.cover.workTimeReload()
         }
@@ -135,6 +138,25 @@ Page {
             workingTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
                     (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
                     (showSecondsDailyCounter ?
+                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
+        }
+        onBreakTimeChanged: {
+
+        }
+    }
+
+    Time2GoTimeCounter {
+        id: time2GoTimeCounterWeek
+        projectUid: time2GoActiveProject.uid
+        type: Time2GoTimeCounter.Week
+
+        onWorkTimeChanged: {
+            var sec = workTime
+            var min = (sec/60).toFixedDown(0)
+            var hour = (min/60).toFixedDown(0)
+            workingTimeWeek.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
+                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
+                    (showSecondsWeeklyCounter ?
                          " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
         }
         onBreakTimeChanged: {
@@ -261,6 +283,7 @@ Page {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeExtraSmall
                     text: qsTr("Today")
+                    color: Theme.highlightColor
                 }
 
                 Label {
@@ -295,6 +318,7 @@ Page {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeExtraSmall
                     text: qsTr("Week")
+                    color: Theme.highlightColor
                 }
 
                 Label {
@@ -315,6 +339,7 @@ Page {
                     horizontalAlignment: Text.AlignHCenter
                     font.pixelSize: Theme.fontSizeExtraSmall
                     text: qsTr("Month")
+                    color: Theme.highlightColor
                 }
 
                 Label {

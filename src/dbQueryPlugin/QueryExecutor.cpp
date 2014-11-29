@@ -248,24 +248,30 @@ QueryExecutor* QueryExecutor::GetInstance()
 
 void QueryExecutor::loadTimeCounter(QVariantMap query)
 {
-    QString sqlQuery;
+    QString start;
+    QString end;
     int seconds = 0;
     int counterType = query["counter"].toInt();
     query["running"] = false;
 
-// TODO take projectUid into account
-    //query["projectuid"]
-
     switch (counterType) {
     case CounterType::Day:
 //        qDebug() << "day";
-        sqlQuery = "select start, end from workunits where start > date('now') or end > date('now','+2 hour');";
+        start = "'now'";
+        end = "'now','+2 hour'";
+//        sqlQuery = "select start, end from workunits where (projectuid=) and (start > date('now') or end > date('now','+2 hour'));";
         break;
     case CounterType::Week:
+        qDebug() << "Week";
+        start = "'now','weekday 1','-7 days'";
+        end = "'now','weekday 1','-7 days'";
+//        sqlQuery = "select start, end from workunits where () and (start > date('now','weekday 1','-7 days') or end > date('now','weekday 1', '-7 days'));";
         break;
     case CounterType::Month:
 //        qDebug() << "month";
-        sqlQuery = "select start, end from workunits where start > date('now','start of month') or end > date('now','start of month','+2 hour');";
+        start = "'now','start of month'";
+        end = "'now','start of month'";
+//        sqlQuery = "select start, end from workunits where () and (start > date('now','start of month') or end > date('now','start of month'));";
         break;
     case CounterType::Individual:
         break;
@@ -275,48 +281,62 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         return;
     }
 
-    QSqlQuery sql(sqlQuery, m_db);
-    while (sql.next()) {
-//        qDebug() << "work unit start: " << sql.value(0).toString() << " end: " << sql.value(1).toString();
-        QDateTime start = sql.value(0).toDateTime();
-        QTime startTime = start.time();
-        // Sanity check for validity and start date from future -> discard this work unit
-        if (!start.date().isValid() || start.date() > QDate::currentDate()) {
-            continue;
-        }
-        // If day counter: Check start date if it is before today
-        // If yes -> set to midnight
-        if ((counterType == CounterType::Day) && (start.date() < QDate::currentDate())) {
-            startTime = QTime(0, 0, 0, 0);
-        }
-//        qDebug() << "start time: " << startTime.toString();
+    QSqlQuery sql(QString("SELECT start, end FROM workunits WHERE (projectuid=%1) and (start > date(%2) or end > date(%3));")
+                  .arg(query["projectuid"].toInt())
+                  .arg(start)
+                  .arg(end),
+                  m_db);
+    qDebug() << sql.lastQuery();
+    if (sql.lastError().type() == QSqlError::NoError ) {
+        while (sql.next()) {
+            if (counterType == CounterType::Week)
+                qDebug() << "work unit start: " << sql.value(0).toString() << " end: " << sql.value(1).toString();
+            QDateTime start = sql.value(0).toDateTime();
+            QTime startTime = start.time();
+            // Sanity check for validity and start date from future -> discard this work unit
+            if (!start.date().isValid() || start.date() > QDate::currentDate()) {
+                continue;
+            }
+            // If day counter: Check start date if it is before today
+            // If yes -> set to midnight
+            if ((counterType == CounterType::Day) && (start.date() < QDate::currentDate())) {
+                startTime = QTime(0, 0, 0, 0);
+            }
+//            qDebug() << "start time: " << startTime.toString();
 
-        QDateTime end = sql.value(1).toDateTime();
-        QTime endTime = end.time();
-        // Check if end date is set otherwise the work unit is still running
-        if (!end.date().isValid()) {
-            query["running"] = true;
-            endTime = QTime::currentTime();
-        } else
-        // If day counter: Sanity check for end date from any day before today -> discard this work unit
-        if ((counterType == CounterType::Day) && (end.date() < QDate::currentDate())) {
-            continue;
-        } else
-        // If day counter: Check if end date is after today
-        // If yes -> set to one second before next midnight
-        if ((counterType == CounterType::Day) && (end.date() > QDate::currentDate())) {
-            endTime = QTime(23,59,59,999);
-        }
-//        qDebug() << "end time: " << endTime.toString();
+            QDateTime end = sql.value(1).toDateTime();
+            QTime endTime = end.time();
+            // Check if end date is set otherwise the work unit is still running
+            if (!end.date().isValid()) {
+                query["running"] = true;
+                endTime = QTime::currentTime();
+            } else
+                // If day counter: Sanity check for end date from any day before today -> discard this work unit
+                if ((counterType == CounterType::Day) && (end.date() < QDate::currentDate())) {
+                    continue;
+                } else
+                    // If day counter: Check if end date is after today
+                    // If yes -> set to one second before next midnight
+                    if ((counterType == CounterType::Day) && (end.date() > QDate::currentDate())) {
+                        endTime = QTime(23,59,59,999);
+                    }
+//            qDebug() << "end time: " << endTime.toString();
 
-        seconds += startTime.msecsTo(endTime);
-//        qDebug() << "Milliseconds: " << seconds;
+            seconds += startTime.msecsTo(endTime);
+//            qDebug() << "Milliseconds: " << seconds;
+        }
+        query["worktime"] = seconds;
+        // Send result back to QML world
+
+        // TODO: calculate break time
+        query["breaktime"] = 0;
+
+        query["done"] = true;
+    } else {
+        qDebug() << "ERROR";
+        query["done"] = false;
+        query["error"] = sql.lastError().text();
     }
-    query["worktime"] = seconds;
-    // Send result back to QML world
-
-    // TODO: calculate break time
-    query["breaktime"] = 0;
 
     Q_EMIT actionDone(query);
 }

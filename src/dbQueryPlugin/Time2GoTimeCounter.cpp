@@ -56,7 +56,7 @@ Time2GoTimeCounter::~Time2GoTimeCounter()
 void Time2GoTimeCounter::setProjectUid(const int value)
 {
     m_project_uid = value;
-    reload();
+//    reload();
 }
 
 void Time2GoTimeCounter::dbQueryResults(QVariant query)
