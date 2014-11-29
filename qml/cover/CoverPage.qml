@@ -152,10 +152,12 @@ CoverBackground {
             var sec = workTime
             var min = (sec/60).toFixedDown(0)
             var hour = (min/60).toFixedDown(0)
-            workingTime.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
-                    (showSecondsWorkTime ?
-                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
+            workingTimeHours.text = (hour < 10 ? "0" : "") + (hour).toString()
+            workingTimeMinutes.text = (min%60 < 10 ? "0" : "") + (min%60).toString()
+//            workingTime.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
+//                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
+//                    (showSecondsWorkTime ?
+//                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
         }
         onBreakTimeChanged: {
 
@@ -247,20 +249,61 @@ CoverBackground {
                 width: parent.width - 2 * Theme.paddingSmall
                 spacing: 0
 
-                Label {
-                    id: workingTime
-                    enabled: text !== ""
-                    visible: enabled
-                    width: parent.width
-                    horizontalAlignment: Text.AlignHCenter
-                    wrapMode: Text.Wrap
-                    font.family: Theme.fontFamily
-                    font.pixelSize: Theme.fontSizeHuge
-                    text: "--:--:--"
-                    color: __workingTime > __maxWorkingTime ?
-                               "red" : (coverPage.state === "CHECKED_IN" ?
-                                            Theme.primaryColor : Theme.secondaryColor)
+                Item {
+                    width: workingTimeHours.width + workingTimeH.width +
+                           workingTimeMinutes.width + workingTimeM.width
+                    height: workingTimeHours.height
+                    anchors.horizontalCenter: parent.horizontalCenter
+
                     opacity: coverPage.state === "CHECKED_IN" ? 1.0 : 0.6
+
+                    Label {
+                        id: workingTimeHours
+                        anchors.left: parent.left
+                        anchors.top: parent.top
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeHuge
+                        text: "--"
+                        color: __workingTime > __maxWorkingTime ?
+                                   "red" : (coverPage.state === "CHECKED_IN" ?
+                                                Theme.primaryColor : Theme.secondaryColor)
+//                        opacity: coverPage.state === "CHECKED_IN" ? 1.0 : 0.6
+                    }
+                    Label {
+                        id: workingTimeH
+                        anchors.left: workingTimeHours.right
+                        anchors.top: parent.top
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeMedium
+                        text: "h"
+                        color: __workingTime > __maxWorkingTime ?
+                                   "red" : (coverPage.state === "CHECKED_IN" ?
+                                                Theme.primaryColor : Theme.secondaryColor)
+//                        opacity: coverPage.state === "CHECKED_IN" ? 1.0 : 0.6
+                    }
+                    Label {
+                        id: workingTimeMinutes
+                        anchors.left: workingTimeH.right
+                        anchors.top: parent.top
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeHuge
+                        text: "--"
+                        color: __workingTime > __maxWorkingTime ?
+                                   "red" : (coverPage.state === "CHECKED_IN" ?
+                                                Theme.primaryColor : Theme.secondaryColor)
+//                        opacity: coverPage.state === "CHECKED_IN" ? 1.0 : 0.6
+                    }
+                    Label {
+                        id: workingTimeM
+                        anchors.left: workingTimeMinutes.right
+                        anchors.top: parent.top
+                        font.family: Theme.fontFamily
+                        font.pixelSize: Theme.fontSizeMedium
+                        text: "m"
+                        color: __workingTime > __maxWorkingTime ?
+                                   "red" : (coverPage.state === "CHECKED_IN" ?
+                                                Theme.primaryColor : Theme.secondaryColor)
+                    }
                 }
 
                 Label {
