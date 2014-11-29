@@ -351,15 +351,8 @@ Page {
         }
     }
 
-//    Component {
-//        ReportPage {
-//            id: reportPage
-//        }
-//    }
-
     Component.onCompleted: {
         // Load latest work unit from database
-        console.log("Load latest work unit")
         time2GoWorkUnit.loadLatestWorkUnit()
     }
 
@@ -367,7 +360,6 @@ Page {
         if (status === PageStatus.Active && !applicationWindow._reportPageLoaded) {
             // Set in global object to not load report page twice, it will crash otherwise
             applicationWindow._reportPageLoaded = true
-            console.log("pageStack push ReportPage")
             pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
         }
     }
