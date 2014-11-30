@@ -385,7 +385,8 @@ Page {
         if (status === PageStatus.Active && !applicationWindow._reportPageLoaded) {
             // Set in global object to not load report page twice, it will crash otherwise
             applicationWindow._reportPageLoaded = true
-            pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
+            pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"),
+                                   { reportModel: applicationWindow.reportModel })
         }
     }
 

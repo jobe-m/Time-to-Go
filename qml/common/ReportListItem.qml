@@ -16,7 +16,10 @@ ListItem {
 
     function listItemRemove() {
         workUnitForDeletion.uid = model.uid
-        remorseAction("Deleting work unit", function() { workUnitForDeletion.deleteWorkUnit() })
+        remorseAction("Deleting work unit", function(){
+            workUnitForDeletion.deleteWorkUnit()
+            reportPage.reportModel.deleteItem(model.uid)
+        })
     }
 
     ListView.onAdd: AddAnimation {

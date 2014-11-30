@@ -7,6 +7,8 @@ import "../common"
 Page {
     id: reportPage
 
+    property Time2GoReportListModel reportModel: null
+
     SilicaListView {
         id: listView
         currentIndex: -1

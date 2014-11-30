@@ -76,6 +76,7 @@ public:
 public:
     Q_INVOKABLE void loadReport();
     Q_INVOKABLE void clear();
+    Q_INVOKABLE void deleteItem(int uid);
 
 public:
     Time2GoReportListModel(QObject *parent = 0);

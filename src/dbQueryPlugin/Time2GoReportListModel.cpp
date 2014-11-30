@@ -121,3 +121,22 @@ void Time2GoReportListModel::addItemToListModel(const ReportItem &item)
     // signal to QML
     emit modelDataChanged();
 }
+
+void Time2GoReportListModel::deleteItem(int uid)
+{
+    // look at each item in list model
+    for (int i = 0; i < m_items.count(); i++) {
+        if (m_items[i].m_uid == uid) {
+            // found it, delete it from list model
+            beginRemoveRows(QModelIndex(), i, i);
+            m_items.removeAt(i);
+            endRemoveRows();
+            // signal to property to update itself in QML
+            emit modelDataChanged();
+            // emit isEmptyChanged signal if last item was deleted
+            if (m_items.isEmpty()) {
+                emit isEmptyChanged();
+            }
+        }
+    }
+}
