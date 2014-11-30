@@ -64,7 +64,8 @@ OTHER_FILES += \
     qml/pages/ReportPage.qml \
     qml/common/DateTimeLine.qml \
     qml/Main.qml \
-    qml/common/ReportListItem.qml
+    qml/common/ReportListItem.qml \
+    qml/common/HourMinutesSeconds.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line
