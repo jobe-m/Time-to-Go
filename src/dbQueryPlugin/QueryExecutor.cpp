@@ -263,8 +263,15 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         break;
     case CounterType::Week:
         qDebug() << "Week";
-        start = "'now','weekday 1','-7 days'";
-        end = "'now','weekday 1','-7 days'";
+        if (QDate::currentDate().dayOfWeek() == 1) {
+            // it's monday so don't subtract one week
+            start = "'now','weekday 1'";
+            end = "'now','weekday 1'";
+        } else {
+            // weekday 1 gives us the next monday so substract one week to get last monday
+            start = "'now','weekday 1','-7 days'";
+            end = "'now','weekday 1','-7 days'";
+        }
 //        sqlQuery = "select start, end from workunits where () and (start > date('now','weekday 1','-7 days') or end > date('now','weekday 1', '-7 days'));";
         break;
     case CounterType::Month:
