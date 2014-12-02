@@ -28,7 +28,7 @@ Item {
     Label {
         id: hoursSymbol
         anchors.left: hoursLabel.right
-        anchors.top: parent.top
+        anchors.baseline: hoursLabel.baseline
         font.family: Theme.fontFamily
         font.pixelSize: symbolSize
         text: "h"
@@ -38,7 +38,7 @@ Item {
     Label {
         id: minutesLabel
         anchors.left: hoursSymbol.right
-        anchors.top: parent.top
+        anchors.baseline: hoursLabel.baseline
         font.family: Theme.fontFamily
         font.pixelSize: textSize
         text: minutes
@@ -48,7 +48,7 @@ Item {
     Label {
         id: minutesSymbol
         anchors.left: minutesLabel.right
-        anchors.top: parent.top
+        anchors.baseline: minutesLabel.baseline
         font.family: Theme.fontFamily
         font.pixelSize: symbolSize
         text: "m"
@@ -60,7 +60,7 @@ Item {
         enabled: showSeconds
         visible: showSeconds
         anchors.left: minutesSymbol.right
-        anchors.top: parent.top
+        anchors.baseline: hoursLabel.baseline
         font.family: Theme.fontFamily
         font.pixelSize: textSize
         text: seconds
@@ -72,7 +72,7 @@ Item {
         enabled: showSeconds
         visible: showSeconds
         anchors.left: secondsLabel.right
-        anchors.top: parent.top
+        anchors.baseline: hoursLabel.baseline
         font.family: Theme.fontFamily
         font.pixelSize: symbolSize
         text: "s"
