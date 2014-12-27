@@ -1,6 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0">
+<TS version="2.1">
+<context>
+    <name>EditWorkUnitDialog</name>
+    <message>
+        <source>Begin and end of work unit</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notes</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Save</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Discard</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Edit Work Unit</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
 <context>
     <name>FirstPage</name>
     <message>

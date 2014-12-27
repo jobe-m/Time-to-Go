@@ -15,9 +15,9 @@ ListItem {
     width: parent ? parent.width : screen.width
 
     function listItemRemove() {
-        workUnitForDeletion.uid = model.uid
+        workUnitToDelete.uid = model.uid
         remorseAction("Deleting work unit", function(){
-            workUnitForDeletion.deleteWorkUnit()
+            workUnitToDelete.deleteWorkUnit()
             reportPage.reportModel.deleteItem(model.uid)
         })
     }
@@ -63,8 +63,17 @@ ListItem {
     }
 
     onClicked: {
-//        pageStack.push(Qt.resolvedUrl("EditWorkUnitDialog.qml").toString(),
-//                       { "uid": model.uid })
+        workUnitToEdit.uid = model.uid
+        var dialog = pageStack.push("EditWorkUnitDialog.qml", {
+                                        "workUnit": workUnitToEdit,
+                                        "projectUid": workUnitToEdit.projectUid
+                                    })
+                    dialog.accepted.connect(function() {
+                        // Save changed work unit
+                        workUnitToEdit.save()
+                        // Update work unit report item in list model
+                        reportModel.updateItem(model.uid, dialog.projectUid, dialog.start, dialog.end, dialog.breakTime)
+                    })
     }
 
     Component {

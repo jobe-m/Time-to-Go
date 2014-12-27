@@ -111,6 +111,7 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
     QVariantMap reply = query.toMap();
     // Check if reply details are for us
     if (m_salt == reply["salt"].toInt()) {
+//        qDebug() << "result: " << reply;
         switch (reply["type"].toInt()) {
         case QueryType::LoadLatestWorkUnit:
             if (reply["done"].toBool() && !reply["end"].toDateTime().isValid()) {

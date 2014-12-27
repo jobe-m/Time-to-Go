@@ -140,3 +140,8 @@ void Time2GoReportListModel::deleteItem(int uid)
         }
     }
 }
+
+void Time2GoReportListModel::updateItem(int uid, int projectUid, QDate start, QDate end, int breakTime)
+{
+
+}

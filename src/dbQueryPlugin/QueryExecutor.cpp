@@ -152,7 +152,26 @@ void QueryExecutor::saveProject(QVariantMap query)
 
 void QueryExecutor::loadWorkUnit(QVariantMap query)
 {
+    QSqlQuery sql(QString("SELECT * FROM workunits WHERE (uid=%1);")
+                  .arg(query["uid"].toInt()), m_db);
 
+    if (sql.next()) {
+        query["uid"] = sql.value(0);
+//        qDebug() << sql.value(0);
+        query["projectuid"] = sql.value(1);
+//        qDebug() << sql.value(1);
+        query["start"] = sql.value(2);
+//        qDebug() << sql.value(2);
+        query["end"] = sql.value(3);
+//        qDebug() << sql.value(3);
+        query["notes"] = sql.value(4);
+//        qDebug() << sql.value(4);
+        query["done"] = true;
+    } else {
+        query["done"] = false;
+    }
+    // Send result back to QML world
+    Q_EMIT actionDone(query);
 }
 
 void QueryExecutor::deleteWorkUnit(QVariantMap query)

@@ -87,7 +87,31 @@ Page {
     }
 
     Time2GoWorkUnit {
-        id: workUnitForDeletion
+        id: workUnitToDelete
+    }
+
+
+    Time2GoWorkUnit {
+        id: workUnitToEdit
+
+        onTimeChanged: {
+//            console.log("from report page")
+//            console.log("start end validity: " + start, end, validStartDateTime, validEndDateTime)
+//            if (validStartDateTime) {
+//                workDateTimeLine.setStartDateTime(start)
+//            }
+//            if (validEndDateTime) {
+//                workDateTimeLine.setEndDateTime(end)
+//            }
+//            console.log("Update report model from workUnitForEdit onTimeChanged")
+//            applicationWindow.reportModel.loadReport()
+//            time2GoTimeCounterDay.reload()
+//            time2GoTimeCounterWeek.reload()
+//            time2GoTimeCounterMonth.reload()
+//            applicationWindow.cover.workTimeReload()
+        }
+        onUnfinishedWorkUnit: {
+        }
     }
 
     // The delegate for each section header

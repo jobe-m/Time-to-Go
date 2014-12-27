@@ -104,7 +104,7 @@ Page {
             if (validEndDateTime) {
                 workDateTimeLine.setEndDateTime(end)
             }
-            console.log("Reload report model from workunit onTimeChanged")
+//            console.log("Reload report model from workunit onTimeChanged")
             applicationWindow.reportModel.loadReport()
 
             time2GoTimeCounterDay.reload()
