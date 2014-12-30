@@ -100,6 +100,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
+            enabled: parent.text !== "--/--"
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
                                                 date: (startYear === 0) ?
@@ -134,6 +135,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
+            enabled: parent.text !== "--/--"
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
                                                 date: (endYear === 0) ?
@@ -160,6 +162,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
+            enabled: showSec ? parent.text !== "--:--:--" : parent.text !== "--:--"
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
                                                 hour: startHour,
@@ -204,6 +207,7 @@ Item {
 
         MouseArea {
             anchors.fill: parent
+            enabled: showSec ? parent.text !== "--:--:--" : parent.text !== "--:--"
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
                                                 hour: endHour,
