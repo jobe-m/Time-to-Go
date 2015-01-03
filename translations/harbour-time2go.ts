@@ -77,6 +77,10 @@
 <context>
     <name>ReportPage</name>
     <message>
+        <source>Refresh report</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Time sheet</source>
         <translation type="unfinished"></translation>
     </message>

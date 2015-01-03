@@ -278,10 +278,9 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
 //        qDebug() << "day";
         start = "'now'";
         end = "'now','+2 hour'";
-//        sqlQuery = "select start, end from workunits where (projectuid=) and (start > date('now') or end > date('now','+2 hour'));";
         break;
     case CounterType::Week:
-        qDebug() << "Week";
+//        qDebug() << "Week";
         if (QDate::currentDate().dayOfWeek() == 1) {
             // it's monday so don't subtract one week
             start = "'now','weekday 1'";
@@ -291,13 +290,11 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
             start = "'now','weekday 1','-7 days'";
             end = "'now','weekday 1','-7 days'";
         }
-//        sqlQuery = "select start, end from workunits where () and (start > date('now','weekday 1','-7 days') or end > date('now','weekday 1', '-7 days'));";
         break;
     case CounterType::Month:
 //        qDebug() << "month";
         start = "'now','start of month'";
         end = "'now','start of month'";
-//        sqlQuery = "select start, end from workunits where () and (start > date('now','start of month') or end > date('now','start of month'));";
         break;
     case CounterType::Individual:
         break;
@@ -312,11 +309,10 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
                   .arg(start)
                   .arg(end),
                   m_db);
-    qDebug() << sql.lastQuery();
+//    qDebug() << sql.lastQuery();
     if (sql.lastError().type() == QSqlError::NoError ) {
         while (sql.next()) {
-            if (counterType == CounterType::Week)
-                qDebug() << "work unit start: " << sql.value(0).toString() << " end: " << sql.value(1).toString();
+//            if (counterType == CounterType::Week) qDebug() << "work unit start: " << sql.value(0).toString() << " end: " << sql.value(1).toString();
             QDateTime start = sql.value(0).toDateTime();
             QTime startTime = start.time();
             // Sanity check for validity and start date from future -> discard this work unit
@@ -336,16 +332,15 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
             if (!end.date().isValid()) {
                 query["running"] = true;
                 endTime = QTime::currentTime();
-            } else
+            } else if ((counterType == CounterType::Day) && (end.date() < QDate::currentDate())) {
                 // If day counter: Sanity check for end date from any day before today -> discard this work unit
-                if ((counterType == CounterType::Day) && (end.date() < QDate::currentDate())) {
-                    continue;
-                } else
-                    // If day counter: Check if end date is after today
-                    // If yes -> set to one second before next midnight
-                    if ((counterType == CounterType::Day) && (end.date() > QDate::currentDate())) {
-                        endTime = QTime(23,59,59,999);
-                    }
+                continue;
+            } else if ((counterType == CounterType::Day) && (end.date() > QDate::currentDate())) {
+                // If day counter: Check if end date is after today
+                // If yes -> set to one second before next midnight
+
+                endTime = QTime(23,59,59,999);
+            }
 //            qDebug() << "end time: " << endTime.toString();
 
             seconds += startTime.msecsTo(endTime);
