@@ -7,8 +7,8 @@ Dialog {
 
     property Time2GoWorkUnit workUnit: null
     property int projectUid: 0
-    property date start: null
-    property date end: null
+    property date start
+    property date end
     property int breakTime: 0
     property string notes: ""
 

@@ -22,6 +22,20 @@ ListItem {
         })
     }
 
+    function editItem() {
+        workUnitToEdit.uid = model.uid
+        var dialog = pageStack.push("EditWorkUnitDialog.qml", {
+                                        "workUnit": workUnitToEdit,
+                                        "projectUid": workUnitToEdit.projectUid
+                                    })
+                    dialog.accepted.connect(function() {
+                        // Save changed work unit
+                        workUnitToEdit.save()
+                        // Update work unit report item in list model
+                        reportModel.updateItem(model.uid, dialog.projectUid, dialog.start, dialog.end, dialog.breakTime)
+                    })
+    }
+
     ListView.onAdd: AddAnimation {
         target: reportListItem
     }
@@ -63,17 +77,7 @@ ListItem {
     }
 
     onClicked: {
-        workUnitToEdit.uid = model.uid
-        var dialog = pageStack.push("EditWorkUnitDialog.qml", {
-                                        "workUnit": workUnitToEdit,
-                                        "projectUid": workUnitToEdit.projectUid
-                                    })
-                    dialog.accepted.connect(function() {
-                        // Save changed work unit
-                        workUnitToEdit.save()
-                        // Update work unit report item in list model
-                        reportModel.updateItem(model.uid, dialog.projectUid, dialog.start, dialog.end, dialog.breakTime)
-                    })
+        editItem()
     }
 
     Component {
@@ -84,6 +88,7 @@ ListItem {
             MenuItem {
                 text: qsTr("Edit")
                 onClicked: {
+                    editItem()
                 }
             }
             MenuItem {
