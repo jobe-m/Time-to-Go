@@ -6,6 +6,8 @@ Item {
     id: dateTimeLine
 
     property bool showSec: false
+    property bool active: showSec ? (startTime.text !== "--:--:--" || endTime.text !== "--:--:--") :
+                                    (startTime.text !== "--:--" || endTime.text !== "--:--")
 
     signal startChanged(date dateTime)
     signal endChanged(date dateTime)
@@ -105,7 +107,9 @@ Item {
                 var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
                                                 date: (startYear === 0) ?
                                                           new Date()
-                                                        : new Date(startYear + "/" + startMonth + "/" + startDay)
+                                                        : new Date(startYear.toString() + "/" +
+                                                                   (startMonth < 10 ? "0" : "") + startMonth.toString() + "/" +
+                                                                   (startDay < 10 ? "0" : "") + startDay.toString())
                                             })
                 dialog.accepted.connect(function() {
                     startYear = dialog.year
@@ -140,7 +144,9 @@ Item {
                 var dialog = pageStack.push("Sailfish.Silica.DatePickerDialog", {
                                                 date: (endYear === 0) ?
                                                           new Date()
-                                                        : new Date(endYear + "/" + endMonth + "/" + endDay)
+                                                        : new Date(endYear.toString() + "/" +
+                                                                   (endMonth < 10 ? "0" : "") + endMonth.toString() + "/" +
+                                                                   (endDay < 10 ? "0" : "") + endDay.toString())
                                             })
                 dialog.accepted.connect(function() {
                     endYear = dialog.year
@@ -197,9 +203,6 @@ Item {
 
     Label {
         id: endTime
-        property int hour: 0
-        property int min: 0
-        property int sec: 0
         anchors.right: parent.right
         anchors.verticalCenter: parent.verticalCenter
         font.pixelSize: Theme.fontSizeMedium
