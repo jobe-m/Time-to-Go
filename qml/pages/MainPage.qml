@@ -261,9 +261,9 @@ Page {
                 title: "Time2Go"
             }
 
-            SectionHeader {
-                text: qsTr("Active project")
-            }
+//            SectionHeader {
+//                text: qsTr("Active project")
+//            }
 
             Label {
                 id: activeProjectLabel
@@ -380,9 +380,24 @@ Page {
                 }
             }
 
-//            SectionHeader {
-//                text: qsTr("Begin and end of break(s)")
-//            }
+            SectionHeader {
+                text: qsTr("Break time")
+            }
+
+            BreakTimeLine {
+                id: breakTime
+                enabled: workDateTimeLine.active
+                opacity: enabled ? 1.0 : 0.6
+                textColor: enabled ? Theme.primaryColor : Theme.secondaryColor
+
+                onBreakTimeChanged: {
+
+                }
+            }
+
+            SectionHeader {
+                text: qsTr("Notes")
+            }
         }
     }
 

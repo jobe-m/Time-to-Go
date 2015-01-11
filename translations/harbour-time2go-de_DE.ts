@@ -54,10 +54,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Active project</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Time spend on active project</source>
         <translation type="unfinished"></translation>
     </message>
@@ -75,6 +71,14 @@
     </message>
     <message>
         <source>Today</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Break time</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Notes</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
