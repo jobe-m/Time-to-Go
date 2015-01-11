@@ -66,7 +66,8 @@ OTHER_FILES += \
     qml/Main.qml \
     qml/common/ReportListItem.qml \
     qml/common/HourMinutesSeconds.qml \
-    qml/common/EditWorkUnitDialog.qml
+    qml/common/EditWorkUnitDialog.qml \
+    qml/common/BreakTimeLine.qml
 
 # to disable building translations every time, comment out the
 # following CONFIG line
