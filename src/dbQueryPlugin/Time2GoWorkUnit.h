@@ -72,6 +72,7 @@ signals:
     void endChanged();
     void notesChanged();
     void dbQueryError(int errorType, const QString errorText);
+    void finishedWorkUnit();
     void unfinishedWorkUnit();
     void timeChanged();
 

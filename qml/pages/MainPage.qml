@@ -81,6 +81,10 @@ Page {
         __maxWorkingTime = value
     }
 
+    function reloadWorkTime() {
+        time2GoWorkUnit.loadLatestWorkUnit()
+    }
+
     // internal
     property int __maxWorkingTime: 60*60*9999 // in seconds
     property int __workingTime: 0 // in seconds
@@ -112,6 +116,12 @@ Page {
             time2GoTimeCounterMonth.reload()
             applicationWindow.cover.workTimeReload()
         }
+        onFinishedWorkUnit: {
+            console.log("Finished work unit, set to CHECKED_OUT")
+            state = "CHECKED_OUT"
+            applicationWindow.cover.checkOut()
+        }
+
         onUnfinishedWorkUnit: {
             // on application start set check in if there is a workunit with no end date time
             console.log("Unfinished work unit, set to CHECKED_IN")
@@ -385,8 +395,7 @@ Page {
         if (status === PageStatus.Active && !applicationWindow._reportPageLoaded) {
             // Set in global object to not load report page twice, it will crash otherwise
             applicationWindow._reportPageLoaded = true
-            pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"),
-                                   { reportModel: applicationWindow.reportModel })
+            pageStack.pushAttached(Qt.resolvedUrl("ReportPage.qml"))
         }
     }
 

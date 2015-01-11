@@ -116,6 +116,8 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
         case QueryType::LoadLatestWorkUnit:
             if (reply["done"].toBool() && !reply["end"].toDateTime().isValid()) {
                 Q_EMIT unfinishedWorkUnit();
+            } else {
+                Q_EMIT finishedWorkUnit();
             }
         case QueryType::LoadWorkUnit: {
             if (reply["done"].toBool()) {

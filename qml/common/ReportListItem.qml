@@ -18,7 +18,10 @@ ListItem {
         workUnitToDelete.uid = model.uid
         remorseAction("Deleting work unit", function(){
             workUnitToDelete.deleteWorkUnit()
-            reportPage.reportModel.deleteItem(model.uid)
+            // Update UI components
+            applicationWindow.reportModel.deleteItem(model.uid)
+            applicationWindow.mainPage.reloadWorkTime()
+//            applicationWindow.cover.workTimeReload()
         })
     }
 
@@ -31,8 +34,10 @@ ListItem {
                     dialog.accepted.connect(function() {
                         // Save changed work unit
                         workUnitToEdit.save()
-                        // Update work unit report item in list model
-                        reportModel.updateItem(model.uid, dialog.projectUid, dialog.start, dialog.end, dialog.breakTime)
+                        // Update UI components
+                        applicationWindow.mainPage.reloadWorkTime()
+                        applicationWindow.reportModel.loadReport()
+//                        applicationWindow.cover.workTimeReload()
                     })
     }
 

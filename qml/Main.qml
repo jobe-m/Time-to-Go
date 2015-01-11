@@ -73,6 +73,12 @@ ApplicationWindow
         }
     }
 
+    // This function has to be called if a work unit was changed. It will update the UI accordingly with new data.
+    function workUnitItemChanged() {
+        console.log("Update UI")
+        mainPage.reloadWorkTime()
+    }
+
     initialPage: mainPageContainer
     cover: coverPage
 
