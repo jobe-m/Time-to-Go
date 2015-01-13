@@ -46,8 +46,8 @@ Page {
                     color: Theme.highlightColor
                 }
                 Label {
-                    x: Theme.paddingLarge * 12
-                    text: qsTr("Break")
+                    x: Theme.paddingLarge * 11
+                    text: qsTr("Break time")
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.highlightColor
                 }

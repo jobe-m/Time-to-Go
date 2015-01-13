@@ -68,12 +68,12 @@ ListItem {
     }
 
     HourMinutesSeconds {
-        x: Theme.paddingLarge * 12
+        x: Theme.paddingLarge * 11
         anchors.verticalCenter: parent.verticalCenter
         showSeconds: false
         margin: Theme.paddingSmall
         textSize: Theme.fontSizeMedium
-        symbolSize: Theme.fontSizeExtraSmall - 1
+        symbolSize: Theme.fontSizeExtraSmall
         textColor: reportListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
         hours: breakTimeHours
         minutes: breakTimeMinutes
@@ -85,7 +85,7 @@ ListItem {
         showSeconds: false
         margin: Theme.paddingSmall
         textSize: Theme.fontSizeMedium
-        symbolSize: Theme.fontSizeExtraSmall - 1
+        symbolSize: Theme.fontSizeExtraSmall
         textColor: reportListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
         hours: workTimeHours
         minutes: workTimeMinutes

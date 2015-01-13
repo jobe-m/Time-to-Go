@@ -108,6 +108,7 @@ Page {
             if (validEndDateTime) {
                 workDateTimeLine.setEndDateTime(end)
             }
+            breakTimeLine.setTime(breakTime)
 //            console.log("Reload report model from workunit onTimeChanged")
             applicationWindow.reportModel.loadReport()
 
@@ -385,13 +386,14 @@ Page {
             }
 
             BreakTimeLine {
-                id: breakTime
+                id: breakTimeLine
                 enabled: workDateTimeLine.active
                 opacity: enabled ? 1.0 : 0.6
                 textColor: enabled ? Theme.primaryColor : Theme.secondaryColor
 
                 onBreakTimeChanged: {
-
+                    time2GoWorkUnit.breakTime = seconds
+                    time2GoWorkUnit.save()
                 }
             }
 

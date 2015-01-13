@@ -44,9 +44,9 @@ Time2GoTimeCounter::Time2GoTimeCounter(QObject *parent) :
 
 Time2GoTimeCounter::~Time2GoTimeCounter()
 {
-    if (m_dbQueryExecutor) {
-        delete m_dbQueryExecutor;
-    }
+//    if (m_dbQueryExecutor) {
+//        delete m_dbQueryExecutor;
+//    }
     if (m_updateTimer) {
         delete m_updateTimer;
     }

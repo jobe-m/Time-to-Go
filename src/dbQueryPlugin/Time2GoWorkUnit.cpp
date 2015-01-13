@@ -31,6 +31,7 @@ Time2GoWorkUnit::Time2GoWorkUnit(QObject *parent) :
     m_project_uid(0),
     m_start(),
     m_end(),
+    m_break_time(0),
     m_notes("")
 {
     m_dbQueryExecutor = QueryExecutor::GetInstance();
@@ -39,9 +40,9 @@ Time2GoWorkUnit::Time2GoWorkUnit(QObject *parent) :
 
 Time2GoWorkUnit::~Time2GoWorkUnit()
 {
-    if (m_dbQueryExecutor) {
-        delete m_dbQueryExecutor;
-    }
+//    if (m_dbQueryExecutor) {
+//        delete m_dbQueryExecutor;
+//    }
 }
 
 // With setUid all work unit details will be loaded from database
@@ -76,6 +77,11 @@ void Time2GoWorkUnit::setNotes(const QString& value)
     m_notes = value;
 }
 
+void Time2GoWorkUnit::setBreakTime(const int value)
+{
+    m_break_time = value;
+}
+
 void Time2GoWorkUnit::save()
 {
     saveWorkUnit();
@@ -102,6 +108,7 @@ void Time2GoWorkUnit::saveWorkUnit()
     query["projectuid"] = m_project_uid;
     query["start"] = m_start;
     query["end"] = m_end;
+    query["breaktime"] = m_break_time;
     query["notes"] = m_notes;
     m_dbQueryExecutor->queueAction(query);
 }
@@ -125,6 +132,7 @@ void Time2GoWorkUnit::dbQueryResults(QVariant query)
                 m_project_uid = reply["projectuid"].toInt();
                 m_start = reply["start"].toDateTime();
                 m_end = reply["end"].toDateTime();
+                m_break_time = reply["breaktime"].toInt();
                 m_notes = reply["notes"].toString();
                 Q_EMIT timeChanged();
             } else {
@@ -160,6 +168,7 @@ void Time2GoWorkUnit::reset()
     m_project_uid = 0;
     m_start = QDateTime();
     m_end = QDateTime();
+    m_break_time = 0;
     m_notes = "";
 }
 

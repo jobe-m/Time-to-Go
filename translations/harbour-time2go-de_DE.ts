@@ -112,11 +112,11 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Break</source>
+        <source>Work time</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Work time</source>
+        <source>Break time</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

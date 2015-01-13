@@ -9,14 +9,19 @@ Item {
 
     signal breakTimeChanged(int seconds)
 
+    function setTime(seconds) {
+        __hours = (seconds/(60*60)).toFixedDown(0)
+        __minutes = (seconds/60 % 60).toFixedDown(0)
+    }
+
     function reset() {
-        hours = 0
-        minutes = 0
+        __hours = 0
+        __minutes = 0
     }
 
     // internal
-    property int hours: 0
-    property int minutes: 0
+    property int __hours: 0
+    property int __minutes: 0
 
     x: Theme.paddingLarge
     width: parent.width - Theme.paddingLarge * 2
@@ -32,8 +37,8 @@ Item {
 
     HourMinutesSeconds {
         id: breakTime
-        hours: parent.hours.toString()
-        minutes: parent.minutes.toString()
+        hours: __hours.toString()
+        minutes: __minutes.toString()
         anchors.right: parent.right
         showSeconds: false
         margin: Theme.paddingSmall
@@ -45,15 +50,15 @@ Item {
             enabled: breakTimeLine.enabled
             onClicked: {
                 var dialog = pageStack.push("Sailfish.Silica.TimePickerDialog", {
-                                                hour: breakTimeLine.hours,
-                                                minute: breakTimeLine.minutes,
+                                                hour: __hours,
+                                                minute: __minutes,
                                                 hourMode: DateTime.TwentyfourHours
                                             })
                 dialog.accepted.connect(function() {
-                    breakTimeLine.hours = dialog.hour
-                    breakTimeLine.minutes = dialog.minute
+                    __hours = dialog.hour
+                    __minutes = dialog.minute
                     // Check if date was already set. If not set it to current date
-                    breakTimeChanged((60 * breakTimeLine.minutes) + (60 * 60 * breakTimeLine.hours))
+                    breakTimeChanged((60 * __minutes) + (60 * 60 * __hours))
                 })
             }
         }

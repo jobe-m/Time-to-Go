@@ -36,9 +36,9 @@ Time2GoProject::Time2GoProject(QObject *parent) :
 
 Time2GoProject::~Time2GoProject()
 {
-    if (m_dbQueryExecutor) {
-        delete m_dbQueryExecutor;
-    }
+//    if (m_dbQueryExecutor) {
+//        delete m_dbQueryExecutor;
+//    }
 }
 
 // With setUid all project details will be loaded from database

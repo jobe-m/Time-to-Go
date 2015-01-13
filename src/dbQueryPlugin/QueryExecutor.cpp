@@ -38,8 +38,7 @@ QueryExecutor::QueryExecutor(QObject *parent) :
         m_db.exec("DROP TABLE IF EXISTS settings;");
         m_db.exec("DROP TABLE IF EXISTS projects;");
         m_db.exec("DROP TABLE IF EXISTS workunits;");
-        m_db.exec("DROP TABLE IF EXISTS breaks;");
-*/
+//*/
         if (!m_db.tables().contains("settings")) {
             m_db.exec("CREATE TABLE settings (uid INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
                     "setting INTEGER);");
@@ -52,13 +51,18 @@ QueryExecutor::QueryExecutor(QObject *parent) :
         }
         if (!m_db.tables().contains("workunits")) {
             m_db.exec("CREATE TABLE workunits (uid INTEGER PRIMARY KEY, projectuid INTEGER, "
-                    "start DATE, end DATE, notes TEXT, reserved INTEGER);");
-        }
-        if (!m_db.tables().contains("breaks")) {
-            m_db.exec("CREATE TABLE breaks (uid INTEGER PRIMARY KEY, workunit INTEGER, "
-                    "start DATE, end DATE, notes TEXT, reserved INTEGER);");
+                    "start DATE, end DATE, breaktime INTEGER, notes TEXT, reserved INTEGER);");
         }
     }
+}
+
+QueryExecutor* QueryExecutor::GetInstance()
+{
+    static QueryExecutor* singleton = NULL;
+    if (!singleton) {
+        singleton = new QueryExecutor(0);
+    }
+    return singleton;
 }
 
 void QueryExecutor::queueAction(QVariant msg, int priority) {
@@ -164,8 +168,10 @@ void QueryExecutor::loadWorkUnit(QVariantMap query)
 //        qDebug() << sql.value(2);
         query["end"] = sql.value(3);
 //        qDebug() << sql.value(3);
-        query["notes"] = sql.value(4);
+        query["breaktime"] = sql.value(4);
 //        qDebug() << sql.value(4);
+        query["notes"] = sql.value(5);
+//        qDebug() << sql.value(5);
         query["done"] = true;
     } else {
         query["done"] = false;
@@ -201,10 +207,11 @@ void QueryExecutor::saveWorkUnit(QVariantMap query)
     int uid = query["uid"].toInt();
     if (0 == uid) {
         // Create new work unit
-        sql.prepare("INSERT INTO workunits VALUES (NULL, :projectuid, :start, :end, :notes, 0);");
+        sql.prepare("INSERT INTO workunits VALUES (NULL, :projectuid, :start, :end, :breaktime, :notes, 0);");
         sql.bindValue(":projectuid", query["projectuid"]);
         sql.bindValue(":start", query["start"]);
         sql.bindValue(":end", query["end"]);
+        sql.bindValue(":breaktime", query["breaktime"]);
         sql.bindValue(":notes", query["notes"]);
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError ) {
@@ -217,11 +224,12 @@ void QueryExecutor::saveWorkUnit(QVariantMap query)
         }
     } else {
         // Update existing work unit
-        sql.prepare("UPDATE workunits SET projectuid=(:projectuid), start=(:start), end=(:end), notes=(:notes), reserved=0  WHERE uid=(:uid);");
+        sql.prepare("UPDATE workunits SET projectuid=(:projectuid), start=(:start), end=(:end), breaktime=(:breaktime), notes=(:notes), reserved=0  WHERE uid=(:uid);");
         sql.bindValue(":projectuid", query["projectuid"]);
         sql.bindValue(":start", query["start"]);
         sql.bindValue(":end", query["end"]);
         sql.bindValue(":notes", query["notes"]);
+        sql.bindValue(":breaktime", query["breaktime"]);
         sql.bindValue(":uid", query["uid"]);
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError) {
@@ -246,23 +254,16 @@ void QueryExecutor::loadLatestWorkUnit(QVariantMap query)
 //        qDebug() << sql.value(2);
         query["end"] = sql.value(3);
 //        qDebug() << sql.value(3);
-        query["notes"] = sql.value(4);
+        query["breaktime"] = sql.value(4);
 //        qDebug() << sql.value(4);
+        query["notes"] = sql.value(5);
+//        qDebug() << sql.value(5);
         query["done"] = true;
     } else {
         query["done"] = false;
     }
     // Send result back to QML world
     Q_EMIT actionDone(query);
-}
-
-QueryExecutor* QueryExecutor::GetInstance()
-{
-    static QueryExecutor* singleton = NULL;
-    if (!singleton) {
-        singleton = new QueryExecutor(0);
-    }
-    return singleton;
 }
 
 void QueryExecutor::loadTimeCounter(QVariantMap query)
@@ -371,14 +372,10 @@ void QueryExecutor::loadReport(QVariantMap query)
         Q_EMIT actionDone(query);
     }
     while (sql.next()) {
-        int workSeconds = 0;
-        int breakSeconds = 0;
         QDateTime start = sql.value(2).toDateTime();
         QDateTime end = sql.value(3).toDateTime();
-        workSeconds += start.secsTo(end);
-
-// TODO: calculate break time
-
+        int workSeconds = start.secsTo(end);
+        int breakSeconds = sql.value(4).toInt();
         query["done"] = true;
         query["uid"] = sql.value(0).toInt();
         query["projectuid"] = sql.value(1).toInt();
@@ -391,22 +388,27 @@ void QueryExecutor::loadReport(QVariantMap query)
         }
         query["starttime"] = start.toString("hh:mm");
         if (end.isValid()) {
-            query["endtime"] = end.toString("hh:mm");
-            if (breakSeconds > 0) {
-                query["breaktimehours"] = QString("%1").arg(0);
-                query["breaktimeminutes"] = QString("%1").arg(0);
-            } else {
-                query["breaktimehours"] = QString("--");
-                query["breaktimeminutes"] = QString("--");
+            // Calculate net work time
+            workSeconds -= breakSeconds;
+            // Round up to next full minute
+            int seconds = workSeconds % 60;
+            if (seconds > 0) {
+                workSeconds += 60 - seconds;
             }
+            query["endtime"] = end.toString("hh:mm");
             query["worktimehours"] = QString("%1").arg(workSeconds / (60*60), 2, 10, QLatin1Char('0'));
             query["worktimeminutes"] = QString("%1").arg((workSeconds/60) % 60, 2, 10, QLatin1Char('0'));
         } else {
             query["endtime"] = QString("--:--");
-            query["breaktimehours"] = QString("--");
-            query["breaktimeminutes"] = QString("--");
             query["worktimehours"] = QString("--");
             query["worktimeminutes"] = QString("--");
+        }
+        if (breakSeconds > 0) {
+            query["breaktimehours"] = QString("%1").arg(breakSeconds / (60*60));
+            query["breaktimeminutes"] = QString("%1").arg((breakSeconds/60) % 60, 2, 10, QLatin1Char('0'));
+        } else {
+            query["breaktimehours"] = QString("--");
+            query["breaktimeminutes"] = QString("--");
         }
         Q_EMIT actionDone(query);
     }

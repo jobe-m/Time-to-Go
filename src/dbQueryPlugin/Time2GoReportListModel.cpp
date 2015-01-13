@@ -34,9 +34,9 @@ Time2GoReportListModel::Time2GoReportListModel(QObject *parent)
 
 Time2GoReportListModel::~Time2GoReportListModel()
 {
-    if (m_dbQueryExecutor) {
-        delete m_dbQueryExecutor;
-    }
+//    if (m_dbQueryExecutor) {
+//        delete m_dbQueryExecutor;
+//    }
 }
 
 int Time2GoReportListModel::rowCount(const QModelIndex &parent) const

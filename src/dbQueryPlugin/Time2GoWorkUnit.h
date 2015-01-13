@@ -40,6 +40,7 @@ public:
     Q_PROPERTY(int projectUid READ projectUid WRITE setProjectUid NOTIFY projectUidChanged)
     Q_PROPERTY(QDateTime start READ start WRITE setStart NOTIFY startChanged)
     Q_PROPERTY(QDateTime end READ end WRITE setEnd NOTIFY endChanged)
+    Q_PROPERTY(int breakTime READ breakTime WRITE setBreakTime NOTIFY breakTimeChanged)
     Q_PROPERTY(QString notes READ notes WRITE setNotes NOTIFY notesChanged)
     Q_PROPERTY(bool validStartDateTime READ validStartDateTime)
     Q_PROPERTY(bool validEndDateTime READ validEndDateTime)
@@ -60,6 +61,8 @@ public:
     void setStart(const QDateTime value);
     QDateTime end() { return m_end; }
     void setEnd(const QDateTime value);
+    int breakTime() { return m_break_time; }
+    void setBreakTime(const int value);
     QString notes() { return m_notes; }
     void setNotes(const QString& value);
     bool validStartDateTime() { return m_start.isValid(); }
@@ -70,6 +73,7 @@ signals:
     void projectUidChanged();
     void startChanged();
     void endChanged();
+    void breakTimeChanged();
     void notesChanged();
     void dbQueryError(int errorType, const QString errorText);
     void finishedWorkUnit();
@@ -94,6 +98,7 @@ private:
     int m_project_uid;
     QDateTime m_start;
     QDateTime m_end;
+    int m_break_time;
     QString m_notes;
 };
 
