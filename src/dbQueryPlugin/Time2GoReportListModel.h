@@ -33,14 +33,17 @@ static const int baseRole = Qt::UserRole + 1;
 class ReportItem
 {
 public:
-    ReportItem(int uid, int projectUid, QString day, QString workStart, QString workEnd, QString breakTime, QString workTime)
+    ReportItem(int uid, int projectUid, QString day, QString workStart, QString workEnd,
+               QString breakTimeHours, QString breakTimeMinutes, QString workTimeHours, QString workTimeMinutes)
         : m_uid(uid),
           m_project_uid(projectUid),
           m_day(day),
           m_work_start(workStart),
           m_work_end(workEnd),
-          m_break_time(breakTime),
-          m_work_time(workTime)
+          m_break_time_hours(breakTimeHours),
+          m_break_time_minutes(breakTimeMinutes),
+          m_work_time_hours(workTimeHours),
+          m_work_time_minutes(workTimeMinutes)
     {}
     virtual ~ReportItem() {}
 
@@ -52,8 +55,10 @@ public:
     QString m_day;
     QString m_work_start;
     QString m_work_end;
-    QString m_break_time;
-    QString m_work_time;
+    QString m_break_time_hours;
+    QString m_break_time_minutes;
+    QString m_work_time_hours;
+    QString m_work_time_minutes;
 };
 
 class Time2GoReportListModel : public QAbstractListModel
@@ -125,9 +130,13 @@ inline QVariant ReportItem::get(const int role) const
     case baseRole + 4:
         return m_work_end;
     case baseRole + 5:
-        return m_break_time;
+        return m_break_time_hours;
     case baseRole + 6:
-        return m_work_time;
+        return m_break_time_minutes;
+    case baseRole + 7:
+        return m_work_time_hours;
+    case baseRole + 8:
+        return m_work_time_minutes;
     }
     return QVariant();
 }
@@ -140,8 +149,10 @@ inline QHash<int, QByteArray> ReportItem::createRoles()
     roles[baseRole + 2] = "day";
     roles[baseRole + 3] = "workstart";
     roles[baseRole + 4] = "workend";
-    roles[baseRole + 5] = "breaktime";
-    roles[baseRole + 6] = "worktime";
+    roles[baseRole + 5] = "breaktimehours";
+    roles[baseRole + 6] = "breaktimeminutes";
+    roles[baseRole + 7] = "worktimehours";
+    roles[baseRole + 8] = "worktimeminutes";
     return roles;
 }
 

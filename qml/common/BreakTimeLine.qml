@@ -36,6 +36,7 @@ Item {
         minutes: parent.minutes.toString()
         anchors.right: parent.right
         showSeconds: false
+        margin: Theme.paddingSmall
         textSize: Theme.fontSizeMedium
         symbolSize: Theme.fontSizeExtraSmall
 

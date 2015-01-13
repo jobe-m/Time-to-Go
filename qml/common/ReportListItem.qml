@@ -7,8 +7,10 @@ ListItem {
 
     property string workStart: model.workstart
     property string workEnd: model.workend
-    property string breakTime: model.breaktime
-    property string workTime: model.worktime
+    property string breakTimeHours: model.breaktimehours
+    property string breakTimeMinutes: model.breaktimeminutes
+    property string workTimeHours: model.worktimehours
+    property string workTimeMinutes: model.worktimeminutes
 
     menu: contextMenuComponent
     contentHeight: Theme.itemSizeSmall
@@ -65,20 +67,28 @@ ListItem {
         color: reportListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
     }
 
-    Label {
-        x: Theme.paddingLarge * 13
+    HourMinutesSeconds {
+        x: Theme.paddingLarge * 12
         anchors.verticalCenter: parent.verticalCenter
-        text: breakTime
-        font.pixelSize: Theme.fontSizeMedium
-        color: reportListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+        showSeconds: false
+        margin: Theme.paddingSmall
+        textSize: Theme.fontSizeMedium
+        symbolSize: Theme.fontSizeExtraSmall - 1
+        textColor: reportListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+        hours: breakTimeHours
+        minutes: breakTimeMinutes
     }
 
-    Label {
+    HourMinutesSeconds {
         x: Theme.paddingLarge * 17
         anchors.verticalCenter: parent.verticalCenter
-        text: workTime
-        font.pixelSize: Theme.fontSizeMedium
-        color: reportListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+        showSeconds: false
+        margin: Theme.paddingSmall
+        textSize: Theme.fontSizeMedium
+        symbolSize: Theme.fontSizeExtraSmall - 1
+        textColor: reportListItem.highlighted ? Theme.highlightColor : Theme.primaryColor
+        hours: workTimeHours
+        minutes: workTimeMinutes
     }
 
     onClicked: {

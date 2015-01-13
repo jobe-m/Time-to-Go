@@ -95,8 +95,10 @@ void Time2GoReportListModel::slot_dbQueryResults(QVariant query)
                         reply["day"].toString(),
                         reply["starttime"].toString(),
                         reply["endtime"].toString(),
-                        reply["breaktime"].toString(),
-                        reply["worktime"].toString());
+                        reply["breaktimehours"].toString(),
+                        reply["breaktimeminutes"].toString(),
+                        reply["worktimehours"].toString(),
+                        reply["worktimeminutes"].toString());
                 addItemToListModel(item);
             }
             break;

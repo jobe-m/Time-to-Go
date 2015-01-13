@@ -46,7 +46,7 @@ Page {
                     color: Theme.highlightColor
                 }
                 Label {
-                    x: Theme.paddingLarge * 13
+                    x: Theme.paddingLarge * 12
                     text: qsTr("Break")
                     font.pixelSize: Theme.fontSizeExtraSmall
                     color: Theme.highlightColor
@@ -91,12 +91,5 @@ Page {
 
     Time2GoWorkUnit {
         id: workUnitToEdit
-    }
-
-    // The delegate for each section header
-
-    Component.onCompleted: {
-//        console.log("Reload report model from ReportPage onCompleted")
-//        applicationWindow.reportModel.loadReport()
     }
 }

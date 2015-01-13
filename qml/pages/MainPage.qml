@@ -145,11 +145,11 @@ Page {
             var sec = workTime
             var min = (sec/60).toFixedDown(0)
             var hour = (min/60).toFixedDown(0)
-            workingTimeDay.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
-                    (showSecondsDailyCounter ?
-                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
+            workingTimeDay.hours = (hour < 10 ? "0" : "") + (hour).toString()
+            workingTimeDay.minutes = (min%60 < 10 ? "0" : "") + (min%60).toString()
+            workingTimeDay.seconds = (sec%60 < 10 ? "0" : "") + (sec%60).toString()
         }
+
         onBreakTimeChanged: {
 
         }
@@ -164,11 +164,11 @@ Page {
             var sec = workTime
             var min = (sec/60).toFixedDown(0)
             var hour = (min/60).toFixedDown(0)
-            workingTimeWeek.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
-                    (showSecondsWeeklyCounter ?
-                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
+            workingTimeWeek.hours = (hour < 10 ? "0" : "") + (hour).toString()
+            workingTimeWeek.minutes = (min%60 < 10 ? "0" : "") + (min%60).toString()
+            workingTimeWeek.seconds = (sec%60 < 10 ? "0" : "") + (sec%60).toString()
         }
+
         onBreakTimeChanged: {
 
         }
@@ -183,11 +183,11 @@ Page {
             var sec = workTime
             var min = (sec/60).toFixedDown(0)
             var hour = (min/60).toFixedDown(0)
-            workingTimeMonth.text = (hour < 10 ? "0" : "") + (hour).toString() + "h " +
-                    (min%60 < 10 ? "0" : "") + (min%60).toString() + "m" +
-                    (showSecondsMonthlyCounter ?
-                         " " + (sec%60 < 10 ? "0" : "") + (sec%60).toString() + "s" : "")
+            workingTimeMonth.hours = (hour < 10 ? "0" : "") + (hour).toString()
+            workingTimeMonth.minutes = (min%60 < 10 ? "0" : "") + (min%60).toString()
+            workingTimeMonth.seconds = (sec%60 < 10 ? "0" : "") + (sec%60).toString()
         }
+
         onBreakTimeChanged: {
 
         }
@@ -296,28 +296,28 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Label {
+                HourMinutesSeconds {
                     id: workingTimeDay
                     anchors.top: dayLabel.bottom
-                    anchors.left: parent.left
-                    anchors.right: dayLabel.right
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Theme.fontSizeExtraLarge
-                    text: "--:--:--"
-                    color: __workingTime > __maxWorkingTime ?
-                               "red" : (mainPage.state === "CHECKED_IN" ?
-                                            Theme.primaryColor : Theme.secondaryColor)
+                    anchors.horizontalCenter: dayLabel.horizontalCenter
+                    showSeconds: showSecondsDailyCounter
+                    margin: Theme.paddingMedium
+                    textSize: Theme.fontSizeExtraLarge
+                    symbolSize: Theme.fontSizeSmall
+                    textColor: __workingTime > __maxWorkingTime ?
+                                   "red" : (mainPage.state === "CHECKED_IN" ?
+                                                Theme.primaryColor : Theme.secondaryColor)
                     opacity: mainPage.state === "CHECKED_IN" ? 1.0 : 0.6
                 }
 
-                Label {
+                HourMinutesSeconds {
                     id: breakTimeDay
                     anchors.top: workingTimeDay.bottom
-                    anchors.left: parent.left
-                    anchors.right: dayLabel.right
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Theme.fontSizeMedium
-                    text: "--:--:--"
+                    anchors.horizontalCenter: dayLabel.horizontalCenter
+                    showSeconds: showSecondsDailyCounter
+                    textSize: Theme.fontSizeMedium
+                    symbolSize: Theme.fontSizeExtraSmall
+                    opacity: mainPage.state === "CHECKED_IN" ? 1.0 : 0.6
                 }
 
                 Label {
@@ -331,14 +331,14 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Label {
+                HourMinutesSeconds {
                     id: workingTimeWeek
                     anchors.top: weekLabel.bottom
-                    anchors.left: weekLabel.left
-                    anchors.right: parent.right
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Theme.fontSizeMedium
-                    text: "--:--"
+                    anchors.horizontalCenter: weekLabel.horizontalCenter
+                    showSeconds: showSecondsWeeklyCounter
+                    margin: Theme.paddingSmall
+                    textSize: Theme.fontSizeMedium
+                    symbolSize: Theme.fontSizeExtraSmall
                 }
 
                 Label {
@@ -352,14 +352,14 @@ Page {
                     color: Theme.highlightColor
                 }
 
-                Label {
+                HourMinutesSeconds {
                     id: workingTimeMonth
                     anchors.top: monthLabel.bottom
-                    anchors.left: weekLabel.left
-                    anchors.right: parent.right
-                    horizontalAlignment: Text.AlignHCenter
-                    font.pixelSize: Theme.fontSizeMedium
-                    text: "--:--"
+                    anchors.horizontalCenter: monthLabel.horizontalCenter
+                    showSeconds: showSecondsMonthlyCounter
+                    margin: Theme.paddingSmall
+                    textSize: Theme.fontSizeMedium
+                    symbolSize: Theme.fontSizeExtraSmall
                 }
             }
 

@@ -6,6 +6,7 @@ Item {
     property string minutes: "--"
     property string seconds: "--"
     property bool showSeconds: false
+    property int margin: 0
     property int textSize: Theme.fontSizeHuge
     property int symbolSize: Theme.fontSizeMedium
     property color textColor: Theme.primaryColor
@@ -27,6 +28,7 @@ Item {
 
     Label {
         id: hoursSymbol
+        visible: hoursLabel.text !== "--"
         anchors.left: hoursLabel.right
         anchors.baseline: hoursLabel.baseline
         font.family: Theme.fontFamily
@@ -38,6 +40,7 @@ Item {
     Label {
         id: minutesLabel
         anchors.left: hoursSymbol.right
+        anchors.leftMargin: parent.margin
         anchors.baseline: hoursLabel.baseline
         font.family: Theme.fontFamily
         font.pixelSize: textSize
@@ -47,6 +50,7 @@ Item {
 
     Label {
         id: minutesSymbol
+        visible: minutesLabel.text !== "--"
         anchors.left: minutesLabel.right
         anchors.baseline: minutesLabel.baseline
         font.family: Theme.fontFamily
@@ -60,6 +64,7 @@ Item {
         enabled: showSeconds
         visible: showSeconds
         anchors.left: minutesSymbol.right
+        anchors.leftMargin: parent.margin
         anchors.baseline: hoursLabel.baseline
         font.family: Theme.fontFamily
         font.pixelSize: textSize
@@ -70,7 +75,7 @@ Item {
     Label {
         id: secondsSymbol
         enabled: showSeconds
-        visible: showSeconds
+        visible: showSeconds && secondsLabel.text !== "--"
         anchors.left: secondsLabel.right
         anchors.baseline: hoursLabel.baseline
         font.family: Theme.fontFamily

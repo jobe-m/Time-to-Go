@@ -393,17 +393,20 @@ void QueryExecutor::loadReport(QVariantMap query)
         if (end.isValid()) {
             query["endtime"] = end.toString("hh:mm");
             if (breakSeconds > 0) {
-                query["breaktime"] = QString("%1m").arg(0);
+                query["breaktimehours"] = QString("%1").arg(0);
+                query["breaktimeminutes"] = QString("%1").arg(0);
             } else {
-                query["breaktime"] = QString("-");
+                query["breaktimehours"] = QString("--");
+                query["breaktimeminutes"] = QString("--");
             }
-            query["worktime"] = QString("%1h %2m")
-                    .arg(workSeconds / (60*60), 2, 10, QLatin1Char('0'))
-                    .arg((workSeconds/60) % 60, 2, 10, QLatin1Char('0'));
+            query["worktimehours"] = QString("%1").arg(workSeconds / (60*60), 2, 10, QLatin1Char('0'));
+            query["worktimeminutes"] = QString("%1").arg((workSeconds/60) % 60, 2, 10, QLatin1Char('0'));
         } else {
             query["endtime"] = QString("--:--");
-            query["breaktime"] = QString("-");
-            query["worktime"] = QString("-");
+            query["breaktimehours"] = QString("--");
+            query["breaktimeminutes"] = QString("--");
+            query["worktimehours"] = QString("--");
+            query["worktimeminutes"] = QString("--");
         }
         Q_EMIT actionDone(query);
     }
