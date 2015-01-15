@@ -5,6 +5,8 @@
 #include "QueryExecutor.h"
 #include "Time2GoReportListModel.h"
 
+static QueryExecutor* singleton = NULL;
+
 QueryExecutor::QueryExecutor(QObject *parent) :
     QObject(parent)
 {
@@ -33,12 +35,12 @@ QueryExecutor::QueryExecutor(QObject *parent) :
     }
 
     if (m_db.isOpen()) {
-/*
+
         // DEBUG: delete outdated database tables
-        m_db.exec("DROP TABLE IF EXISTS settings;");
-        m_db.exec("DROP TABLE IF EXISTS projects;");
-        m_db.exec("DROP TABLE IF EXISTS workunits;");
-//*/
+//        m_db.exec("DROP TABLE IF EXISTS settings;");
+//        m_db.exec("DROP TABLE IF EXISTS projects;");
+//        m_db.exec("DROP TABLE IF EXISTS workunits_v2;");
+
         if (!m_db.tables().contains("settings")) {
             m_db.exec("CREATE TABLE settings (uid INTEGER PRIMARY KEY, project INTEGER, type INTEGER,"
                     "setting INTEGER);");
@@ -49,16 +51,35 @@ QueryExecutor::QueryExecutor(QObject *parent) :
             // create one default group
             m_db.exec("INSERT INTO projects VALUES (NULL, \"my awesome project\", 0);");
         }
-        if (!m_db.tables().contains("workunits")) {
-            m_db.exec("CREATE TABLE workunits (uid INTEGER PRIMARY KEY, projectuid INTEGER, "
+        if (!m_db.tables().contains("workunits_v2")) {
+            m_db.exec("CREATE TABLE workunits_v2 (uid INTEGER PRIMARY KEY, projectuid INTEGER, "
                     "start DATE, end DATE, breaktime INTEGER, notes TEXT, reserved INTEGER);");
         }
     }
+/*    // Migrate old table schema
+    if (m_db.tables().contains("workunits")) {
+        QSqlQuery sqlOld(QString("SELECT * FROM workunits;"), m_db);
+        QSqlQuery sqlNew(m_db);
+
+        while (sqlOld.next()) {
+            qDebug() << "Copy work unit " << sqlOld.value(0).toInt();
+            sqlNew.prepare("INSERT INTO workunits_v2 VALUES (NULL, :projectuid, :start, :end, :breaktime, :notes, 0);");
+            sqlNew.bindValue(":projectuid", sqlOld.value(1));
+            sqlNew.bindValue(":start", sqlOld.value(2));
+            sqlNew.bindValue(":end", sqlOld.value(3));
+            sqlNew.bindValue(":breaktime", QVariant((int)0));
+            sqlNew.bindValue(":notes", sqlOld.value(4));
+            sqlNew.exec();
+            if (sqlNew.lastError().type() != QSqlError::NoError ) {
+                qDebug() << "ERROR: Could not copy work unit with uid " << sqlOld.value(0);
+            }
+        }
+    }
+*/
 }
 
 QueryExecutor* QueryExecutor::GetInstance()
 {
-    static QueryExecutor* singleton = NULL;
     if (!singleton) {
         singleton = new QueryExecutor(0);
     }
@@ -133,7 +154,7 @@ void QueryExecutor::saveProject(QVariantMap query)
         if (sql.lastError().type() == QSqlError::NoError ) {
             // Update uid in query
             query["uid"] = sql.lastInsertId();
-            // or if lastInsertId is not working do: "SELECT max(uid) FROM workunits;"
+            // or if lastInsertId is not working do: "SELECT max(uid) FROM workunits_v2;"
             query["done"] = true;
         } else {
             query["error"] = sql.lastError().text();
@@ -156,7 +177,7 @@ void QueryExecutor::saveProject(QVariantMap query)
 
 void QueryExecutor::loadWorkUnit(QVariantMap query)
 {
-    QSqlQuery sql(QString("SELECT * FROM workunits WHERE (uid=%1);")
+    QSqlQuery sql(QString("SELECT * FROM workunits_v2 WHERE (uid=%1);")
                   .arg(query["uid"].toInt()), m_db);
 
     if (sql.next()) {
@@ -187,7 +208,7 @@ void QueryExecutor::deleteWorkUnit(QVariantMap query)
     int uid = query["uid"].toInt();
     if (0 != uid) {
         // Delete work unit
-        sql.prepare("DELETE FROM workunits WHERE uid=:uid;");
+        sql.prepare("DELETE FROM workunits_v2 WHERE uid=:uid;");
         sql.bindValue(":uid", uid);
         sql.exec();
         if (sql.lastError().type() == QSqlError::NoError ) {
@@ -207,7 +228,7 @@ void QueryExecutor::saveWorkUnit(QVariantMap query)
     int uid = query["uid"].toInt();
     if (0 == uid) {
         // Create new work unit
-        sql.prepare("INSERT INTO workunits VALUES (NULL, :projectuid, :start, :end, :breaktime, :notes, 0);");
+        sql.prepare("INSERT INTO workunits_v2 VALUES (NULL, :projectuid, :start, :end, :breaktime, :notes, 0);");
         sql.bindValue(":projectuid", query["projectuid"]);
         sql.bindValue(":start", query["start"]);
         sql.bindValue(":end", query["end"]);
@@ -217,14 +238,14 @@ void QueryExecutor::saveWorkUnit(QVariantMap query)
         if (sql.lastError().type() == QSqlError::NoError ) {
             // Update uid in query
             query["uid"] = sql.lastInsertId();
-            // or if lastInsertId is not working do: "SELECT max(id) FROM workunits;"
+            // or if lastInsertId is not working do: "SELECT max(id) FROM workunits_v2;"
             query["done"] = true;
         } else {
             query["error"] = sql.lastError().text();
         }
     } else {
         // Update existing work unit
-        sql.prepare("UPDATE workunits SET projectuid=(:projectuid), start=(:start), end=(:end), breaktime=(:breaktime), notes=(:notes), reserved=0  WHERE uid=(:uid);");
+        sql.prepare("UPDATE workunits_v2 SET projectuid=(:projectuid), start=(:start), end=(:end), breaktime=(:breaktime), notes=(:notes), reserved=0  WHERE uid=(:uid);");
         sql.bindValue(":projectuid", query["projectuid"]);
         sql.bindValue(":start", query["start"]);
         sql.bindValue(":end", query["end"]);
@@ -244,7 +265,7 @@ void QueryExecutor::saveWorkUnit(QVariantMap query)
 
 void QueryExecutor::loadLatestWorkUnit(QVariantMap query)
 {
-    QSqlQuery sql("SELECT * FROM workunits ORDER BY datetime(start) DESC LIMIT 1;", m_db);
+    QSqlQuery sql("SELECT * FROM workunits_v2 ORDER BY datetime(start) DESC LIMIT 1;", m_db);
     if (sql.next()) {
         query["uid"] = sql.value(0);
 //        qDebug() << sql.value(0);
@@ -305,7 +326,7 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         return;
     }
 
-    QSqlQuery sql(QString("SELECT start, end FROM workunits WHERE (projectuid=%1) and (start > date(%2) or end > date(%3));")
+    QSqlQuery sql(QString("SELECT start, end FROM workunits_v2 WHERE (projectuid=%1) and (start > date(%2) or end > date(%3));")
                   .arg(query["projectuid"].toInt())
                   .arg(start)
                   .arg(end),
@@ -365,8 +386,8 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
 
 void QueryExecutor::loadReport(QVariantMap query)
 {
-//    QSqlQuery sql("SELECT * FROM workunits WHERE start > date('now','start of month') OR end > date('now','start of month') ORDER BY datetime(start) DESC;", m_db);
-    QSqlQuery sql("SELECT * FROM workunits ORDER BY datetime(start) DESC;", m_db);
+//    QSqlQuery sql("SELECT * FROM workunits_v2 WHERE start > date('now','start of month') OR end > date('now','start of month') ORDER BY datetime(start) DESC;", m_db);
+    QSqlQuery sql("SELECT * FROM workunits_v2 ORDER BY datetime(start) DESC;", m_db);
     if (!sql.isValid()) {
         query["done"] = false;
         Q_EMIT actionDone(query);

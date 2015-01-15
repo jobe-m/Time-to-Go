@@ -23,6 +23,10 @@
         <source>Edit Work Unit</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Break time</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>FirstPage</name>

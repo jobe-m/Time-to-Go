@@ -23,7 +23,6 @@ ListItem {
             // Update UI components
             applicationWindow.reportModel.deleteItem(model.uid)
             applicationWindow.mainPage.reloadWorkTime()
-//            applicationWindow.cover.workTimeReload()
         })
     }
 
@@ -39,7 +38,6 @@ ListItem {
                         // Update UI components
                         applicationWindow.mainPage.reloadWorkTime()
                         applicationWindow.reportModel.loadReport()
-//                        applicationWindow.cover.workTimeReload()
                     })
     }
 

@@ -1,11 +1,11 @@
 import QtQuick 2.0
 import Sailfish.Silica 1.0
-import harbour.Time2Go.DatabaseQuery 1.0
+//import harbour.Time2Go.DatabaseQuery 1.0
 
 Dialog {
     id: editWorkUnitDialog
 
-    property Time2GoWorkUnit workUnit: null
+    property QtObject /*Time2GoWorkUnit*/ workUnit: null
     property int projectUid: 0
     property date start
     property date end
@@ -47,6 +47,21 @@ Dialog {
             }
 
             SectionHeader {
+                text: qsTr("Break time")
+            }
+
+            BreakTimeLine {
+                id: breakTimeLine
+                enabled: workDateTimeLine.active
+                opacity: enabled ? 1.0 : 0.6
+                textColor: enabled ? Theme.primaryColor : Theme.secondaryColor
+
+                onBreakTimeChanged: {
+                    breakTime = workUnit.breakTime = seconds
+                }
+            }
+
+            SectionHeader {
                 text: qsTr("Notes")
             }
         }
@@ -63,6 +78,7 @@ Dialog {
             if (workUnit.validEndDateTime) {
                 workDateTimeLine.setEndDateTime(workUnit.end)
             }
+            breakTimeLine.setTime(workUnit.breakTime)
         }
     }
 
