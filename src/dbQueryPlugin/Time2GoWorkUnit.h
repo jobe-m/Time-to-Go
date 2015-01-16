@@ -23,7 +23,7 @@
 #define TIME2GOWORKUNIT_H
 
 #include <QObject>
-#include "QueryExecutor.h"
+#include "BackgroundThread.h"
 
 class Time2GoWorkUnit : public QObject
 {
@@ -51,7 +51,6 @@ public:
     Q_INVOKABLE void deleteWorkUnit();
 
     explicit Time2GoWorkUnit(QObject *parent = 0);
-    virtual ~Time2GoWorkUnit();
 
     int uid() { return m_uid; }
     void setUid(const int value);
@@ -69,6 +68,7 @@ public:
     bool validEndDateTime() { return m_end.isValid(); }
 
 signals:
+    // to QML
     void uidChanged();
     void projectUidChanged();
     void startChanged();
@@ -79,18 +79,18 @@ signals:
     void finishedWorkUnit();
     void unfinishedWorkUnit();
     void timeChanged();
-
-public slots:
+    // to background thread
+    void processDbQuery(QVariant msg);
 
 private slots:
-    // from query executor
-    void dbQueryResults(QVariant query);
+    // from background thread
+    void slot_dbQueryResults(QVariant query);
 
 private:
     void saveWorkUnit();
 
 private:
-    QueryExecutor* m_dbQueryExecutor;
+    BackgroundThread* m_backgroundThread;
     int m_salt;
 
     // details of work unit

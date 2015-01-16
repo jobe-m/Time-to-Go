@@ -259,7 +259,7 @@ Page {
             spacing: Theme.paddingLarge
 
             PageHeader {
-                title: "Time2Go"
+                title: "Time2Go v0.1"
             }
 
 //            SectionHeader {

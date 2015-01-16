@@ -23,20 +23,15 @@
 
 Time2GoReportListModel::Time2GoReportListModel(QObject *parent)
     : QAbstractListModel(parent),
-      m_dbQueryExecutor(NULL),
+      m_backgroundThread(NULL),
       m_salt(rand()),
-      m_report_requested(false),
+//      m_report_requested(false),
       m_items()
 {
-      m_dbQueryExecutor = QueryExecutor::GetInstance();
-      connect(m_dbQueryExecutor, SIGNAL(actionDone(QVariant)), this, SLOT(slot_dbQueryResults(QVariant)));
-}
-
-Time2GoReportListModel::~Time2GoReportListModel()
-{
-//    if (m_dbQueryExecutor) {
-//        delete m_dbQueryExecutor;
-//    }
+    // database loading is done in background do not disrupt the QML main thread
+    m_backgroundThread = BackgroundThread::getInstance();
+    connect(this, SIGNAL(processDbQuery(QVariant)), m_backgroundThread->getWorker(), SLOT(slot_processDbQuery(QVariant)));
+    connect(m_backgroundThread->getWorker(), SIGNAL(dbQueryResults(QVariant)), this, SLOT(slot_dbQueryResults(QVariant)));
 }
 
 int Time2GoReportListModel::rowCount(const QModelIndex &parent) const
@@ -55,15 +50,15 @@ QVariant Time2GoReportListModel::data(const QModelIndex &index, int role) const
 
 void Time2GoReportListModel::clear()
 {
-    m_report_requested = false;
+//    m_report_requested = false;
 
     beginResetModel();
     m_items.clear();
     endResetModel();
 
     // signal to QML and for property update
-    emit modelDataChanged();
-    emit isEmptyChanged();
+    Q_EMIT modelDataChanged();
+    Q_EMIT isEmptyChanged();
 }
 
 void Time2GoReportListModel::loadReport()
@@ -73,13 +68,13 @@ void Time2GoReportListModel::loadReport()
     clear();
 
     // load work unit details from database
-    if (!m_report_requested) {
-        m_report_requested = true;
+//    if (!m_report_requested) {
+//        m_report_requested = true;
         QVariantMap query;
         query["salt"] = m_salt;
         query["type"] = QueryType::LoadReport;
-        m_dbQueryExecutor->queueAction(query);
-    }
+        Q_EMIT processDbQuery(QVariant(query));
+//    }
 }
 
 void Time2GoReportListModel::slot_dbQueryResults(QVariant query)
@@ -117,11 +112,11 @@ void Time2GoReportListModel::addItemToListModel(const ReportItem &item)
 
     // emit isEmptyChanged signal if list view was empty before
     if (m_items.length() == 1) {
-        emit isEmptyChanged();
+        Q_EMIT isEmptyChanged();
     }
 
     // signal to QML
-    emit modelDataChanged();
+    Q_EMIT modelDataChanged();
 }
 
 void Time2GoReportListModel::deleteItem(int uid)
@@ -134,10 +129,10 @@ void Time2GoReportListModel::deleteItem(int uid)
             m_items.removeAt(i);
             endRemoveRows();
             // signal to property to update itself in QML
-            emit modelDataChanged();
+            Q_EMIT modelDataChanged();
             // emit isEmptyChanged signal if last item was deleted
             if (m_items.isEmpty()) {
-                emit isEmptyChanged();
+                Q_EMIT isEmptyChanged();
             }
         }
     }

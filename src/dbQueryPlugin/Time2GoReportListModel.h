@@ -26,7 +26,7 @@
 #include <QStringList>
 #include <QDate>
 
-#include "QueryExecutor.h"
+#include "BackgroundThread.h"
 
 static const int baseRole = Qt::UserRole + 1;
 
@@ -85,8 +85,7 @@ public:
     Q_INVOKABLE void deleteItem(int uid);
 
 public:
-    Time2GoReportListModel(QObject *parent = 0);
-    virtual ~Time2GoReportListModel();
+    explicit Time2GoReportListModel(QObject *parent = 0);
 
     int rowCount(const QModelIndex &parent = QModelIndex()) const;
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const;
@@ -103,14 +102,17 @@ signals:
     // signal for property
     void isEmptyChanged();
 
+    // to background thread
+    void processDbQuery(QVariant query);
+
 private slots:
-    // from query executor
+    // from background thread
     void slot_dbQueryResults(QVariant query);
 
 private:
-    QueryExecutor *m_dbQueryExecutor;
+    BackgroundThread *m_backgroundThread;
     int m_salt;
-    bool m_report_requested;
+//    bool m_report_requested;
 
     QList<ReportItem> m_items;
 };

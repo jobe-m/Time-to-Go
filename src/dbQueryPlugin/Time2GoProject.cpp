@@ -25,20 +25,15 @@
 
 Time2GoProject::Time2GoProject(QObject *parent) :
     QObject(parent),
-    m_dbQueryExecutor(NULL),
+    m_backgroundThread(NULL),
     m_salt(rand()),
     m_uid(0),
     m_name("")
 {
-    m_dbQueryExecutor = QueryExecutor::GetInstance();
-    connect(m_dbQueryExecutor, SIGNAL(actionDone(QVariant)), this, SLOT(dbQueryResults(QVariant)));
-}
-
-Time2GoProject::~Time2GoProject()
-{
-//    if (m_dbQueryExecutor) {
-//        delete m_dbQueryExecutor;
-//    }
+    // database loading is done in background do not disrupt the QML main thread
+    m_backgroundThread = BackgroundThread::getInstance();
+    connect(this, SIGNAL(processDbQuery(QVariant)), m_backgroundThread->getWorker(), SLOT(slot_processDbQuery(QVariant)));
+    connect(m_backgroundThread->getWorker(), SIGNAL(dbQueryResults(QVariant)), this, SLOT(slot_dbQueryResults(QVariant)));
 }
 
 // With setUid all project details will be loaded from database
@@ -50,7 +45,7 @@ void Time2GoProject::setUid(const int value)
     query["salt"] = m_salt;
     query["type"] = QueryType::LoadProject;
     query["uid"] = value;
-    m_dbQueryExecutor->queueAction(query);
+    Q_EMIT processDbQuery(QVariant(query));
 }
 
 void Time2GoProject::setName(const QString &value)
@@ -62,10 +57,10 @@ void Time2GoProject::setName(const QString &value)
     query["type"] = QueryType::SaveProject;
     query["uid"] = m_uid;
     query["name"] = m_name;
-    m_dbQueryExecutor->queueAction(query);
+    Q_EMIT processDbQuery(QVariant(query));
 }
 
-void Time2GoProject::dbQueryResults(QVariant query)
+void Time2GoProject::slot_dbQueryResults(QVariant query)
 {
     QVariantMap reply = query.toMap();
     // Check if reply details are for us

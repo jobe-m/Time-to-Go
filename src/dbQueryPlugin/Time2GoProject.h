@@ -23,7 +23,7 @@
 #define TIME2GOPROJECT_H
 
 #include <QObject>
-#include "QueryExecutor.h"
+#include "BackgroundThread.h"
 
 class Time2GoProject : public QObject
 {
@@ -33,25 +33,28 @@ public:
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
 
     explicit Time2GoProject(QObject *parent = 0);
-    virtual ~Time2GoProject();
 
     int uid() { return m_uid; }
     void setUid(const int value);
     const QString name() { return m_name; }
     void setName(const QString &value);
+
 signals:
+    // to QML
     void uidChanged();
     void nameChanged();
     void dbQueryError(const QString errorText);
+    // to background thread
+    void processDbQuery(QVariant query);
 
 public slots:
 
 private slots:
-    // from query executor
-    void dbQueryResults(QVariant query);
+    // from background thread
+    void slot_dbQueryResults(QVariant query);
 
 private:
-    QueryExecutor* m_dbQueryExecutor;
+    BackgroundThread* m_backgroundThread;
     int m_salt;
 
     int m_uid;

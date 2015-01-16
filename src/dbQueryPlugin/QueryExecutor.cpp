@@ -1,3 +1,4 @@
+
 #include <QThreadPool>
 #include <QDebug>
 #include <QStandardPaths>
@@ -5,19 +6,15 @@
 #include "QueryExecutor.h"
 #include "Time2GoReportListModel.h"
 
-static QueryExecutor* singleton = NULL;
-
 QueryExecutor::QueryExecutor(QObject *parent) :
     QObject(parent)
 {
-    m_worker.setCallObject(this);
-
     m_db = QSqlDatabase::database();
     if (!m_db.isOpen()) {
         m_db = QSqlDatabase::addDatabase("QSQLITE");
 
         QString dataDir = QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-        QString dataFile = QString("%1/database.db").arg(dataDir);
+        QString dataFile = QString("%1/tisno.de/harbour-time2go/database.db").arg(dataDir);
 
         QDir dir(dataDir);
         if (!dir.exists())
@@ -78,23 +75,7 @@ QueryExecutor::QueryExecutor(QObject *parent) :
 */
 }
 
-QueryExecutor* QueryExecutor::GetInstance()
-{
-    if (!singleton) {
-        singleton = new QueryExecutor(0);
-    }
-    return singleton;
-}
-
-void QueryExecutor::queueAction(QVariant msg, int priority) {
-    m_worker.queueAction(msg, priority);
-}
-
-void QueryExecutor::processAction(QVariant message) {
-    processQuery(message);
-}
-
-void QueryExecutor::processQuery(const QVariant &msg)
+void QueryExecutor::slot_processDbQuery(QVariant msg)
 {
     QVariantMap query = msg.toMap();
     if (!query.isEmpty()) {
@@ -136,7 +117,7 @@ void QueryExecutor::loadProject(QVariantMap query)
         }
     }
     // Send result back to QML world
-    Q_EMIT actionDone(query);
+    Q_EMIT dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::saveProject(QVariantMap query)
@@ -172,7 +153,7 @@ void QueryExecutor::saveProject(QVariantMap query)
         }
     }
     // Send result back to QML world
-    Q_EMIT actionDone(query);
+    Q_EMIT dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::loadWorkUnit(QVariantMap query)
@@ -198,7 +179,7 @@ void QueryExecutor::loadWorkUnit(QVariantMap query)
         query["done"] = false;
     }
     // Send result back to QML world
-    Q_EMIT actionDone(query);
+    Q_EMIT dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::deleteWorkUnit(QVariantMap query)
@@ -218,7 +199,7 @@ void QueryExecutor::deleteWorkUnit(QVariantMap query)
         }
     }
     // Send result back to QML world
-    Q_EMIT actionDone(query);
+    Q_EMIT dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::saveWorkUnit(QVariantMap query)
@@ -260,7 +241,7 @@ void QueryExecutor::saveWorkUnit(QVariantMap query)
         }
     }
     // Send result back to QML world
-    Q_EMIT actionDone(query);
+    Q_EMIT dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::loadLatestWorkUnit(QVariantMap query)
@@ -284,7 +265,7 @@ void QueryExecutor::loadLatestWorkUnit(QVariantMap query)
         query["done"] = false;
     }
     // Send result back to QML world
-    Q_EMIT actionDone(query);
+    Q_EMIT dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::loadTimeCounter(QVariantMap query)
@@ -381,7 +362,7 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         query["error"] = sql.lastError().text();
     }
 
-    Q_EMIT actionDone(query);
+    Q_EMIT dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::loadReport(QVariantMap query)
@@ -390,9 +371,10 @@ void QueryExecutor::loadReport(QVariantMap query)
     QSqlQuery sql("SELECT * FROM workunits_v2 ORDER BY datetime(start) DESC;", m_db);
     if (!sql.isValid()) {
         query["done"] = false;
-        Q_EMIT actionDone(query);
+        Q_EMIT dbQueryResults(QVariant(query));
     }
     while (sql.next()) {
+//        qDebug() << "Report - uid: " << sql.value(0).toInt();
         QDateTime start = sql.value(2).toDateTime();
         QDateTime end = sql.value(3).toDateTime();
         int workSeconds = start.secsTo(end);
@@ -431,6 +413,6 @@ void QueryExecutor::loadReport(QVariantMap query)
             query["breaktimehours"] = QString("--");
             query["breaktimeminutes"] = QString("--");
         }
-        Q_EMIT actionDone(query);
+        Q_EMIT dbQueryResults(QVariant(query));
     }
 }

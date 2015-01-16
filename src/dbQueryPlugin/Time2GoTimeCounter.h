@@ -23,7 +23,7 @@
 #define TIME2GOTIMECOUNTER_H
 
 #include <QObject>
-#include "QueryExecutor.h"
+#include "BackgroundThread.h"
 
 class Time2GoTimeCounter : public QObject
 {
@@ -61,23 +61,26 @@ public:
     void setType(const int value);
 
 signals:
+    // to QML
     void uidChanged();
     void projectUidChanged();
     void workTimeChanged();
     void breakTimeChanged();
     void typeChanged();
     void dbQueryError(const QString errorText);
+    // to background thread
+    void processDbQuery(QVariant msg);
 
 public slots:
 
 private slots:
-    // from query executor
-    void dbQueryResults(QVariant query);
+    // from background thread
+    void slot_dbQueryResults(QVariant query);
     // from QTimer
-    void update();
+    void slot_update();
 
 private:
-    QueryExecutor* m_dbQueryExecutor;
+    BackgroundThread* m_backgroundThread;
     QTimer* m_updateTimer;
     QTime m_timer;
     int m_salt;

@@ -1,3 +1,4 @@
+
 #ifndef QUERYEXECUTER_H
 #define QUERYEXECUTER_H
 
@@ -5,8 +6,6 @@
 #include <QVariantMap>
 #include <QStringList>
 #include <QtSql/QtSql>
-
-#include "ThreadWorker.h"
 
 namespace QueryType {
 enum eType {
@@ -52,19 +51,15 @@ class QueryExecutor : public QObject
 {
     Q_OBJECT
 public:
-    explicit QueryExecutor(QObject *parent);
-    static QueryExecutor *GetInstance();
+    explicit QueryExecutor(QObject* parent = 0);
 
 public slots:
-    void queueAction(QVariant msg, int priority = 0);
-    void processAction(QVariant msg);
+    void slot_processDbQuery(QVariant msg);
 
 signals:
-    void actionDone(QVariant msg);
+    void dbQueryResults(QVariant msg);
 
 private:
-    void processQuery(const QVariant &msg);
-
     void loadProject(QVariantMap query);
     void saveProject(QVariantMap query);
     void loadWorkUnit(QVariantMap query);
@@ -75,7 +70,6 @@ private:
     void loadReport(QVariantMap query);
 
 private:
-    ThreadWorker m_worker;
     QSqlDatabase m_db;
 };
 

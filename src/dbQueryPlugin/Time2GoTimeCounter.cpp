@@ -21,11 +21,10 @@
 
 #include <QDebug>
 #include "Time2GoTimeCounter.h"
-#include "QueryExecutor.h"
 
 Time2GoTimeCounter::Time2GoTimeCounter(QObject *parent) :
     QObject(parent),
-    m_dbQueryExecutor(NULL),
+    m_backgroundThread(NULL),
     m_updateTimer(NULL),
     m_timer(),
     m_salt(rand()),
@@ -36,17 +35,17 @@ Time2GoTimeCounter::Time2GoTimeCounter(QObject *parent) :
     m_time_running(false),
     m_update_interval(1000)
 {
-    m_dbQueryExecutor = QueryExecutor::GetInstance();
-    connect(m_dbQueryExecutor, SIGNAL(actionDone(QVariant)), this, SLOT(dbQueryResults(QVariant)));
+    // database loading is done in background do not disrupt the QML main thread
+    m_backgroundThread = BackgroundThread::getInstance();
+    connect(this, SIGNAL(processDbQuery(QVariant)), m_backgroundThread->getWorker(), SLOT(slot_processDbQuery(QVariant)));
+    connect(m_backgroundThread->getWorker(), SIGNAL(dbQueryResults(QVariant)), this, SLOT(slot_dbQueryResults(QVariant)));
+
     m_updateTimer = new QTimer(this);
-    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(update()));
+    connect(m_updateTimer, SIGNAL(timeout()), this, SLOT(slot_update()));
 }
 
 Time2GoTimeCounter::~Time2GoTimeCounter()
 {
-//    if (m_dbQueryExecutor) {
-//        delete m_dbQueryExecutor;
-//    }
     if (m_updateTimer) {
         delete m_updateTimer;
     }
@@ -56,10 +55,9 @@ Time2GoTimeCounter::~Time2GoTimeCounter()
 void Time2GoTimeCounter::setProjectUid(const int value)
 {
     m_project_uid = value;
-//    reload();
 }
 
-void Time2GoTimeCounter::dbQueryResults(QVariant query)
+void Time2GoTimeCounter::slot_dbQueryResults(QVariant query)
 {
     QVariantMap reply = query.toMap();
     // Check if reply details are for us
@@ -92,7 +90,7 @@ void Time2GoTimeCounter::dbQueryResults(QVariant query)
     }
 }
 
-void Time2GoTimeCounter::update()
+void Time2GoTimeCounter::slot_update()
 {
     m_work_time += m_timer.restart();
     Q_EMIT workTimeChanged();
@@ -135,5 +133,5 @@ void Time2GoTimeCounter::reload()
     }
     query["type"] = QueryType::LoadTimeCounter;
     query["projectuid"] = m_project_uid;
-    m_dbQueryExecutor->queueAction(query);
+    Q_EMIT processDbQuery(QVariant(query));
 }
