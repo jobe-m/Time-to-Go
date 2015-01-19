@@ -117,7 +117,7 @@ void QueryExecutor::loadProject(QVariantMap query)
         }
     }
     // Send result back to QML world
-    Q_EMIT dbQueryResults(QVariant(query));
+    emit dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::saveProject(QVariantMap query)
@@ -153,7 +153,7 @@ void QueryExecutor::saveProject(QVariantMap query)
         }
     }
     // Send result back to QML world
-    Q_EMIT dbQueryResults(QVariant(query));
+    emit dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::loadWorkUnit(QVariantMap query)
@@ -179,7 +179,7 @@ void QueryExecutor::loadWorkUnit(QVariantMap query)
         query["done"] = false;
     }
     // Send result back to QML world
-    Q_EMIT dbQueryResults(QVariant(query));
+    emit dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::deleteWorkUnit(QVariantMap query)
@@ -199,7 +199,7 @@ void QueryExecutor::deleteWorkUnit(QVariantMap query)
         }
     }
     // Send result back to QML world
-    Q_EMIT dbQueryResults(QVariant(query));
+    emit dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::saveWorkUnit(QVariantMap query)
@@ -241,7 +241,7 @@ void QueryExecutor::saveWorkUnit(QVariantMap query)
         }
     }
     // Send result back to QML world
-    Q_EMIT dbQueryResults(QVariant(query));
+    emit dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::loadLatestWorkUnit(QVariantMap query)
@@ -265,7 +265,7 @@ void QueryExecutor::loadLatestWorkUnit(QVariantMap query)
         query["done"] = false;
     }
     // Send result back to QML world
-    Q_EMIT dbQueryResults(QVariant(query));
+    emit dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::loadTimeCounter(QVariantMap query)
@@ -362,7 +362,7 @@ void QueryExecutor::loadTimeCounter(QVariantMap query)
         query["error"] = sql.lastError().text();
     }
 
-    Q_EMIT dbQueryResults(QVariant(query));
+    emit dbQueryResults(QVariant(query));
 }
 
 void QueryExecutor::loadReport(QVariantMap query)
@@ -371,7 +371,7 @@ void QueryExecutor::loadReport(QVariantMap query)
     QSqlQuery sql("SELECT * FROM workunits_v2 ORDER BY datetime(start) DESC;", m_db);
     if (!sql.isValid()) {
         query["done"] = false;
-        Q_EMIT dbQueryResults(QVariant(query));
+        emit dbQueryResults(QVariant(query));
     }
     while (sql.next()) {
 //        qDebug() << "Report - uid: " << sql.value(0).toInt();
@@ -413,6 +413,6 @@ void QueryExecutor::loadReport(QVariantMap query)
             query["breaktimehours"] = QString("--");
             query["breaktimeminutes"] = QString("--");
         }
-        Q_EMIT dbQueryResults(QVariant(query));
+        emit dbQueryResults(QVariant(query));
     }
 }

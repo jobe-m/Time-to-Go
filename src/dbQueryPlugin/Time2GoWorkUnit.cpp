@@ -48,7 +48,7 @@ void Time2GoWorkUnit::setUid(const int value)
     query["salt"] = m_salt;
     query["type"] = QueryType::LoadWorkUnit;
     query["uid"] = value;
-    Q_EMIT processDbQuery(QVariant(query));
+    emit processDbQuery(QVariant(query));
 }
 
 void Time2GoWorkUnit::setProjectUid(const int value)
@@ -88,7 +88,7 @@ void Time2GoWorkUnit::deleteWorkUnit()
     query["salt"] = m_salt;
     query["type"] = QueryType::DeleteWorkUnit;
     query["uid"] = m_uid;
-    Q_EMIT processDbQuery(QVariant(query));
+    emit processDbQuery(QVariant(query));
 }
 
 // With setWorkUnit all work unit details will be saved to database
@@ -104,7 +104,7 @@ void Time2GoWorkUnit::saveWorkUnit()
     query["end"] = m_end;
     query["breaktime"] = m_break_time;
     query["notes"] = m_notes;
-    Q_EMIT processDbQuery(QVariant(query));
+    emit processDbQuery(QVariant(query));
 }
 
 void Time2GoWorkUnit::slot_dbQueryResults(QVariant query)
@@ -116,9 +116,9 @@ void Time2GoWorkUnit::slot_dbQueryResults(QVariant query)
         switch (reply["type"].toInt()) {
         case QueryType::LoadLatestWorkUnit:
             if (reply["done"].toBool() && !reply["end"].toDateTime().isValid()) {
-                Q_EMIT unfinishedWorkUnit();
+                emit unfinishedWorkUnit();
             } else {
-                Q_EMIT finishedWorkUnit();
+                emit finishedWorkUnit();
             }
         case QueryType::LoadWorkUnit: {
             if (reply["done"].toBool()) {
@@ -128,9 +128,9 @@ void Time2GoWorkUnit::slot_dbQueryResults(QVariant query)
                 m_end = reply["end"].toDateTime();
                 m_break_time = reply["breaktime"].toInt();
                 m_notes = reply["notes"].toString();
-                Q_EMIT timeChanged();
+                emit timeChanged();
             } else {
-                Q_EMIT dbQueryError(LoadError, reply["error"].toString());
+                emit dbQueryError(LoadError, reply["error"].toString());
             }
             break;
         }
@@ -138,9 +138,9 @@ void Time2GoWorkUnit::slot_dbQueryResults(QVariant query)
             if (reply["done"].toBool()) {
                 // Save uid of object stored in database, so that next time saving we can rever to it
                 m_uid = reply["uid"].toInt();
-                Q_EMIT timeChanged();
+                emit timeChanged();
             } else {
-                Q_EMIT dbQueryError(SaveError, reply["error"].toString());
+                emit dbQueryError(SaveError, reply["error"].toString());
             }
             break;
         }
@@ -149,7 +149,7 @@ void Time2GoWorkUnit::slot_dbQueryResults(QVariant query)
                 // reset this object
                 reset();
             } else {
-                Q_EMIT dbQueryError(DeleteError, reply["error"].toString());
+                emit dbQueryError(DeleteError, reply["error"].toString());
             }
         }
         }
@@ -172,5 +172,5 @@ void Time2GoWorkUnit::loadLatestWorkUnit()
     QVariantMap query;
     query["salt"] = m_salt;
     query["type"] = QueryType::LoadLatestWorkUnit;
-    Q_EMIT processDbQuery(QVariant(query));
+    emit processDbQuery(QVariant(query));
 }

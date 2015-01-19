@@ -57,8 +57,8 @@ void Time2GoReportListModel::clear()
     endResetModel();
 
     // signal to QML and for property update
-    Q_EMIT modelDataChanged();
-    Q_EMIT isEmptyChanged();
+    emit modelDataChanged();
+    emit isEmptyChanged();
 }
 
 void Time2GoReportListModel::loadReport()
@@ -73,7 +73,7 @@ void Time2GoReportListModel::loadReport()
         QVariantMap query;
         query["salt"] = m_salt;
         query["type"] = QueryType::LoadReport;
-        Q_EMIT processDbQuery(QVariant(query));
+        emit processDbQuery(QVariant(query));
 //    }
 }
 
@@ -112,11 +112,11 @@ void Time2GoReportListModel::addItemToListModel(const ReportItem &item)
 
     // emit isEmptyChanged signal if list view was empty before
     if (m_items.length() == 1) {
-        Q_EMIT isEmptyChanged();
+        emit isEmptyChanged();
     }
 
     // signal to QML
-    Q_EMIT modelDataChanged();
+    emit modelDataChanged();
 }
 
 void Time2GoReportListModel::deleteItem(int uid)
@@ -129,10 +129,10 @@ void Time2GoReportListModel::deleteItem(int uid)
             m_items.removeAt(i);
             endRemoveRows();
             // signal to property to update itself in QML
-            Q_EMIT modelDataChanged();
+            emit modelDataChanged();
             // emit isEmptyChanged signal if last item was deleted
             if (m_items.isEmpty()) {
-                Q_EMIT isEmptyChanged();
+                emit isEmptyChanged();
             }
         }
     }

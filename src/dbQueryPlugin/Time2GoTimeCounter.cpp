@@ -67,15 +67,15 @@ void Time2GoTimeCounter::slot_dbQueryResults(QVariant query)
 //            qDebug() << "LoadTimeCounter: " << reply;
             if (m_project_uid != reply["projectuid"].toInt()) {
                 m_project_uid = reply["projectuid"].toInt();
-                Q_EMIT projectUidChanged();
+                emit projectUidChanged();
             }
             if (m_work_time != reply["worktime"].toInt()) {
                 m_work_time = reply["worktime"].toInt();
-                Q_EMIT workTimeChanged();
+                emit workTimeChanged();
             }
             if (m_break_time != reply["breaktime"].toInt()) {
                 m_break_time = reply["breaktime"].toInt();
-                Q_EMIT breakTimeChanged();
+                emit breakTimeChanged();
             }
             m_time_running = reply["running"].toBool();
             if (m_time_running) {
@@ -93,7 +93,7 @@ void Time2GoTimeCounter::slot_dbQueryResults(QVariant query)
 void Time2GoTimeCounter::slot_update()
 {
     m_work_time += m_timer.restart();
-    Q_EMIT workTimeChanged();
+    emit workTimeChanged();
 }
 
 void Time2GoTimeCounter::setUpdateInterval(const int value)
@@ -133,5 +133,5 @@ void Time2GoTimeCounter::reload()
     }
     query["type"] = QueryType::LoadTimeCounter;
     query["projectuid"] = m_project_uid;
-    Q_EMIT processDbQuery(QVariant(query));
+    emit processDbQuery(QVariant(query));
 }

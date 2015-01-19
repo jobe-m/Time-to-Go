@@ -45,7 +45,7 @@ void Time2GoProject::setUid(const int value)
     query["salt"] = m_salt;
     query["type"] = QueryType::LoadProject;
     query["uid"] = value;
-    Q_EMIT processDbQuery(QVariant(query));
+    emit processDbQuery(QVariant(query));
 }
 
 void Time2GoProject::setName(const QString &value)
@@ -57,7 +57,7 @@ void Time2GoProject::setName(const QString &value)
     query["type"] = QueryType::SaveProject;
     query["uid"] = m_uid;
     query["name"] = m_name;
-    Q_EMIT processDbQuery(QVariant(query));
+    emit processDbQuery(QVariant(query));
 }
 
 void Time2GoProject::slot_dbQueryResults(QVariant query)
@@ -71,16 +71,16 @@ void Time2GoProject::slot_dbQueryResults(QVariant query)
             if (reply["done"].toBool()) {
                 m_uid = reply["uid"].toInt();
                 m_name = reply["name"].toString();
-                Q_EMIT uidChanged();
-                Q_EMIT nameChanged();
+                emit uidChanged();
+                emit nameChanged();
             } else {
-                Q_EMIT dbQueryError(reply["error"].toString());
+                emit dbQueryError(reply["error"].toString());
             }
             break;
         }
         case QueryType::SaveProject: {
             if (!reply["done"].toBool()) {
-                Q_EMIT dbQueryError(reply["error"].toString());
+                emit dbQueryError(reply["error"].toString());
             }
             break;
         }
