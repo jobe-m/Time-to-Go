@@ -29,8 +29,8 @@ CoverBackground {
     id: coverPage
 
     property alias activeProjectUid: time2GoActiveProject.uid
-    property bool showSecondsWorkTime: false
-    property bool showSecondsBreakTime: false
+    property bool showSecondsWorkTime: true
+    property bool showSecondsBreakTime: true
 
     signal checkedIn()
     signal checkedOut()
@@ -147,7 +147,7 @@ CoverBackground {
     Time2GoTimeCounter {
         id: time2GoWorkTimeCounter
         projectUid: time2GoActiveProject.uid
-        updateInterval: 60 * 1000 // update every 1 minute
+        updateInterval: (showSecondsWorkTime ? 1 : 60) * 1000
 
         onWorkTimeChanged: {
             __workingTime = workTime
@@ -156,7 +156,7 @@ CoverBackground {
             var hour = (min/60).toFixedDown(0)
             workingTime.hours = (hour < 10 ? "0" : "") + (hour).toString()
             workingTime.minutes = (min%60 < 10 ? "0" : "") + (min%60).toString()
-//            workingTime.seconds = (sec%60 < 10 ? "0" : "") + (sec%60).toString()
+            workingTime.seconds = (sec%60 < 10 ? "0" : "") + (sec%60).toString()
         }
         onBreakTimeChanged: {
 
@@ -251,8 +251,8 @@ CoverBackground {
                 HourMinutesSeconds {
                     id: workingTime
                     anchors.horizontalCenter: parent.horizontalCenter
-                    showSeconds: false
-                    textSize: Theme.fontSizeHuge
+                    showSeconds: showSecondsWorkTime
+                    textSize: Theme.fontSizeExtraLarge
                     textColor: __workingTime > __maxWorkingTime ?
                                    "red" : (coverPage.state === "CHECKED_IN" ?
                                                 Theme.primaryColor : Theme.secondaryColor)
